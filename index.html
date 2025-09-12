@@ -31,6 +31,7 @@
   <script>
   const form = document.getElementById('lookup-form');
   const out = document.getElementById('out');
+  let lastUser = null; // cache last loaded user for edit
 
   function row(label, value) {
     return `
@@ -68,8 +69,9 @@
       }
 
       const u = payload.user;
+      lastUser = u;
       out.innerHTML = `
-        <div class="card">
+        <div class="card" id="user-card">
           ${row('userId', u.userId)}
           ${row('username', u.username)}
           ${row('displayName', u.displayName)}
@@ -83,7 +85,92 @@
           ${row('assignmentUUID', u.assignmentUUID)}
           ${row('lastModifiedDateTime', u.lastModifiedDateTime)}
           ${row('lastModifiedWithTZ', u.lastModifiedWithTZ)}
+          <div style="padding-top:12px"><button id="edit-btn">Edit</button></div>
         </div>`;
+
+      document.getElementById('edit-btn').addEventListener('click', () => {
+        const u = lastUser;
+        const card = document.getElementById('user-card');
+        card.innerHTML = `
+          <form id="edit-form">
+            <div class="row"><div class="label">displayName</div><div class="value"><input name="displayName" type="text" value="${u.displayName ?? ''}"></div></div>
+            <div class="row"><div class="label">email</div><div class="value"><input name="email" type="email" value="${u.email ?? ''}"></div></div>
+            <div class="row"><div class="label">status</div><div class="value"><input name="status" type="text" value="${u.status ?? ''}"></div></div>
+            <div class="row"><div class="label">division</div><div class="value"><input name="division" type="text" value="${u.division ?? ''}"></div></div>
+            <div class="row"><div class="label">department</div><div class="value"><input name="department" type="text" value="${u.department ?? ''}"></div></div>
+            <div class="row"><div class="label">location</div><div class="value"><input name="location" type="text" value="${u.location ?? ''}"></div></div>
+            <div class="row"><div class="label">timeZone</div><div class="value"><input name="timeZone" type="text" value="${u.timeZone ?? ''}"></div></div>
+            <div class="row"><div class="label">defaultLocale</div><div class="value"><input name="defaultLocale" type="text" value="${u.defaultLocale ?? ''}"></div></div>
+            <div style="padding-top:12px; display:flex; gap:8px;">
+              <button type="submit">Save</button>
+              <button type="button" id="cancel-btn">Cancel</button>
+            </div>
+          </form>
+          <div id="edit-msg" class="muted" style="padding-top:8px;"></div>
+        `;
+
+        document.getElementById('cancel-btn').addEventListener('click', () => {
+          // Re-render read-only view by simulating the previous successful fetch flow
+          out.innerHTML = '';
+          const payload = { found: true, user: lastUser };
+          const evt = new Event('submit');
+          // Quick reuse: render as if we just fetched success
+          const u = payload.user;
+          out.innerHTML = `
+            <div class="card" id="user-card">
+              ${row('userId', u.userId)}
+              ${row('username', u.username)}
+              ${row('displayName', u.displayName)}
+              ${row('email', u.email)}
+              ${row('status', u.status)}
+              ${row('division', u.division)}
+              ${row('department', u.department)}
+              ${row('location', u.location)}
+              ${row('timeZone', u.timeZone)}
+              ${row('defaultLocale', u.defaultLocale)}
+              ${row('assignmentUUID', u.assignmentUUID)}
+              ${row('lastModifiedDateTime', u.lastModifiedDateTime)}
+              ${row('lastModifiedWithTZ', u.lastModifiedWithTZ)}
+              <div style="padding-top:12px"><button id=\"edit-btn\">Edit</button></div>
+            </div>`;
+          document.getElementById('edit-btn').click = null;
+        });
+
+        document.getElementById('edit-form').addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          const fd = new FormData(ev.currentTarget);
+          const updates = {};
+          ['displayName','email','status','division','department','location','timeZone','defaultLocale']
+            .forEach(k => {
+              const val = fd.get(k);
+              if (val !== null && val !== u[k]) updates[k] = val;
+            });
+          const msg = document.getElementById('edit-msg');
+          if (Object.keys(updates).length === 0) {
+            msg.textContent = 'No changes to save.';
+            return;
+          }
+          msg.textContent = 'Saving…';
+          try {
+            const resp = await fetch('/api/user', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: u.username, updates })
+            });
+            const ctype = resp.headers.get('content-type') || '';
+            const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+            if (!resp.ok) {
+              msg.innerHTML = `Error: ${data.error || 'Update failed'}\n` + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details || data.raw || '', null, 2));
+              return;
+            }
+            // Merge updates into local view
+            Object.assign(lastUser, updates);
+            msg.textContent = 'Saved.';
+          } catch (e) {
+            msg.textContent = 'Unexpected error: ' + String(e);
+          }
+        });
+      });
     } catch (err) {
       out.innerHTML = `<div class="card"><p>Unexpected error.</p><pre class="value">${String(err)}</pre></div>`;
     }
