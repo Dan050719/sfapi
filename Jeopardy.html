@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jeopardy Game App</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container">
+        <img src="Jeopardylogo.jpg" alt="Jeopardy Game" class="logo" />
+        <div id="upload-section">
+            
+            <input type="file" id="file-input" accept=".txt" />
+            <button id="start-game">Load Game</button>
+            <button id="random-game">Random</button>
+            <button id="willie-mode">Willie Mode</button>
+        </div>
+        <div id="player-setup">
+            <h2>Setup Players (1-4)</h2>
+            <select id="num-players">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+            <button id="generate-player-forms">Generate Forms</button>
+            <div id="player-forms"></div>
+            <button id="start-game-after-setup">Start Game</button>
+        </div>
+        <div id="board-section">
+            <div id="player-scores"></div>
+            <div id="streak"></div>
+            <div id="board" class="board"></div>
+        </div>
+        <div id="question-section">
+            <div id="question-value"></div>
+            <div id="question-text"></div>
+            <div id="buzz-panel"></div>
+            <div id="choices" style="display: none;"></div>
+            <div id="feedback"></div>
+            <button id="submit-answer" style="display: none;">Submit Answer</button>
+            <button id="read-aloud" style="display: none;">Read Aloud</button>
+        </div>
+        <div id="result-section">
+            <h2>Game Over</h2>
+            <div id="final-score"></div>
+            <div id="report"></div>
+            <button id="download-results">Download Results</button>
+            <button id="restart">Restart Game</button>
+        </div>
+    </div>
+    <div id="daily-double-modal" class="modal">
+        <div class="modal-content">
+            <p>Daily Double! Enter your wager (minimum $5, maximum your score or $1000):</p>
+            <input type="number" id="wager-input" min="5" />
+            <button id="modal-confirm">Confirm Wager</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

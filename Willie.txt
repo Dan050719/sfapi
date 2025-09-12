@@ -1,0 +1,36 @@
+CATEGORY | Living Things 101
+MC_MULTI | Which of the following are characteristics that distinguish living things from non-living things? (Select all that apply)|They grow|They are all the same color|They reproduce|They move|A,C,D
+TF | All living things, including humans, plants, and other animals, have the exact same basic needs.|F
+MC_SINGLE | According to the text, what process do plants use to create their own food from sunlight, water, and air?|Respiration|Photosynthesis|Transpiration|Hibernation|B
+MC_SINGLE | What gas do plants absorb from the air through their leaves?|Oxygen|Nitrogen|Carbon dioxide|Helium|C
+MC_MULTI | Other than air, food, and water, what other needs are mentioned for living things in the text? (Select all that apply)|Shelter|Love|Clothing/coverings|Sunlight|A,B,C,D
+CATEGORY | Animal Needs
+MC_MULTI | Which of the following are listed as basic needs for animals? (Select all that apply)|Air|Food|Entertainment|Sleep|A,B,D
+MC_SINGLE | How do animals like sharks differ from others in their sleeping habits according to the text?|They hibernate for long periods|They don't sleep at all|They continue to move while sleeping|They sleep only during the day|C
+TF | The only way animals get water is by drinking from sources like rivers and lakes.|F
+MC_MULTI | The text mentions several feeding behaviours animals use. Which of these are listed? (Select all that apply)|Hunting|Grazing|Farming|Scavenging|A,B,D
+MC_SINGLE | Besides predators, what else do wild animals need protection from?|Cold weather only|Environmental conditions and human impacts|Other animal species|Loud noises|B
+CATEGORY | Plant Power
+MC_SINGLE | During photosynthesis, plants convert air, sunlight, and water into what substance for energy?|Oxygen|Glucose|Chlorophyll|Water Vapor|B
+MC_MULTI | Which parts of a plant are primarily responsible for absorbing sunlight and water? (Select all that apply)|Leaves|Roots|Flowers|Seeds|A,B
+TF | When a plant's needs are not met, its physical appearance remains unchanged.|F
+MC_SINGLE | How do most plants anchor themselves to the ground and absorb nutrients?|Using their leaves|Using their roots|Using their stems|Using their flowers|B
+MC_MULTI | According to the text, which of these are considered basic needs for plants? (Select all that apply)|Sunlight|Water|Soil|Space|A,B,C,D
+CATEGORY | Human Needs
+MC_SINGLE | The theorist Abraham Maslow stated that which type of needs must be met before any others?|Emotional needs|Social needs|Financial needs|Physical needs|D
+TF | Love and having relationships are examples of physical needs.|F
+MC_MULTI | Which of the following are given as examples of human social and emotional needs? (Select all that apply)|A sense of belonging|Shelter|Love|Relationships|A,C,D
+MC_SINGLE | Why are warmth and clothing often included as basic needs for humans?|To look fashionable|To attract mates|To maintain a healthy body temperature|To help them run faster|C
+MC_MULTI | Which of the following are common physical needs shared by both humans and other animals? (Select all that apply)|Air|Food|Water|Sleep|A,B,C,D
+CATEGORY | Wild vs. Tame
+MC_SINGLE | Which group of animals typically must meet all of their needs by themselves?|Farm animals|Pets|Zoo animals|Wild animals|D
+TF | When a human's or animal's needs are not met, their physical appearance and behaviors may change.|T
+MC_MULTI | In the wild, animals that don't have their needs met may be rehabilitated by which of these experts? (Select all that apply)|Veterinarians|Rangers|Doctors|Teachers|A,B,C
+MC_SINGLE | Being tired, hungry, or thirsty are the first signs that what is happening?|The animal is happy|The animal is playing|The animal's needs are not being met|The animal is about to hibernate|C
+MC_MULTI | Domesticated animals, which have needs provided by humans, include which of the following examples? (Select all that apply)|Pets|Farm animals|Zoo animals|Wild animals|A,B,C
+CATEGORY | Made of What?
+MC_MULTI | Which of these are listed as man-made or manufactured materials? (Select all that apply)|Wood|Plastic|Glass|Paper|B,C,D
+TF | Rubber can only be a natural material from a plant.|F
+MC_SINGLE | Materials like wool, silk, and leather are examples of natural materials that come from what source?|The ground|Plants|Animals|The air|C
+MC_SINGLE | From the list provided, which material comes from animals?|Wood|Cotton|Stone|Leather|D
+MC_MULTI | Which of the following are natural materials that come from the ground? (Select all that apply)|Copper|Silver|Gold|Plasticine|A,B,C

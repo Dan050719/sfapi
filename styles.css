@@ -1,0 +1,312 @@
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #060CE9;
+            color: gold;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #000066;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 100%;
+            z-index: 1000;
+            position: relative;
+            overflow: auto;
+            max-height: 90vh;
+        }
+        h1, h2 {
+            text-align: center;
+            color: gold;
+            margin-top: 0;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 10px;
+            width: min(60%, 420px);
+            height: auto;
+        }
+        #upload-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #file-input {
+            margin: 10px 0;
+        }
+        #start-game, #load-sample, #random-game, #willie-mode {
+            background-color: #FFD700;
+            color: navy;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 5px;
+        }
+        #start-game:hover, #load-sample:hover, #random-game:hover, #willie-mode:hover {
+            background-color: #E5C100;
+        }
+        #player-setup {
+            display: none;
+            text-align: center;
+        }
+        #player-forms {
+            margin: 20px 0;
+        }
+        .player-form {
+            margin: 10px 0;
+        }
+        #generate-player-forms, #start-game-after-setup {
+            background-color: #FFD700;
+            color: navy;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #generate-player-forms:hover, #start-game-after-setup:hover {
+            background-color: #E5C100;
+        }
+        #board-section {
+            display: none;
+        }
+        #player-scores {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .player-score {
+            display: inline-block;
+            margin: 10px;
+            padding: 5px;
+            border: 1px solid gold;
+            border-radius: 5px;
+        }
+        .player-score.control {
+            background-color: yellow;
+            color: navy;
+        }
+        .board {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .subboard {
+            display: grid;
+            grid-template-columns: repeat(var(--subcols, 1), 1fr);
+            gap: 10px;
+            flex: 1;
+        }
+        @media (max-width: 800px) {
+            .board {
+                flex-direction: column;
+            }
+        }
+        .category {
+            background-color: #000066;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid gold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .clue {
+            background-color: #000066;
+            color: gold;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            cursor: pointer;
+            border: 2px solid gold;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .clue:hover {
+            background-color: #000099;
+        }
+        .clue.answered {
+            background-color: #333333;
+            color: gray;
+            cursor: default;
+        }
+        #question-section {
+            display: none;
+            background-color: #000066;
+            padding: 20px;
+            border: 2px solid gold;
+            margin-top: 20px;
+        }
+        #question-value {
+            font-size: 18px;
+            color: gold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #question-text {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: white;
+            text-align: center;
+        }
+        #buzz-panel {
+            display: none;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .buzz-btn {
+            background-color: red;
+            color: white;
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .buzz-btn:hover {
+            background-color: darkred;
+        }
+        .choice {
+            background-color: #000099;
+            color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .choice:hover {
+            background-color: #0000CC;
+        }
+        .selected {
+            background-color: #FFFF00 !important;
+            color: navy;
+        }
+        .correct {
+            background-color: #00FF00 !important;
+            color: navy;
+        }
+        .incorrect {
+            background-color: #FF0000 !important;
+            color: white;
+        }
+        #feedback {
+            text-align: center;
+            font-size: 18px;
+            margin: 10px 0;
+            font-weight: bold;
+            color: white;
+        }
+        #submit-answer, #read-aloud {
+            background-color: #FFD700;
+            color: navy;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            display: block;
+            margin: 10px auto;
+        }
+        #submit-answer:hover, #read-aloud:hover {
+            background-color: #E5C100;
+        }
+        #streak {
+            text-align: center;
+            margin: 6px 0 14px;
+            color: gold;
+            font-size: 14px;
+        }
+        #result-section {
+            display: none;
+            text-align: center;
+        }
+        #final-score {
+            font-size: 24px;
+            color: gold;
+            margin: 20px 0;
+        }
+        #report {
+            text-align: left;
+            margin-top: 20px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        .report-section {
+            margin-bottom: 20px;
+        }
+        .report-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            color: navy;
+        }
+        .report-correct {
+            background-color: #d4edda;
+        }
+        .report-incorrect {
+            background-color: #f8d7da;
+        }
+        #restart, #download-results {
+            background-color: #FFD700;
+            color: navy;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        #restart:hover, #download-results:hover {
+            background-color: #E5C100;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #000066;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 400px;
+            width: 80%;
+            color: white;
+        }
+        .modal-content p {
+            margin: 0 0 20px;
+        }
+        .modal-content button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #modal-confirm {
+            background-color: #FFD700;
+            color: navy;
+        }
+        #modal-confirm:hover {
+            background-color: #E5C100;
+        }

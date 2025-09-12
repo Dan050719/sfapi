@@ -7,14 +7,16 @@ import { fileURLToPath } from 'url';
 
 dotenv.config();
 
+// ESM-safe __dirname resolution (since this file uses ESM imports)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
-
-// ESM-safe __dirname resolution for serving index.html
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Serve all game assets (HTML, CSS, JS, media) from project root
+// so Jeopardy.html, styles.css, app.js, mp3s, etc. are reachable.
+app.use(express.static(__dirname));
 
 const PORT = process.env.PORT || 3000;
 const BASE_URL = process.env.BASE_URL;                  // e.g., https://apisalesdemo2.successfactors.eu
@@ -570,9 +572,32 @@ app.put('/api/user', async (req, res) => {
 // Simple health check
 app.get('/health', (req, res) => res.json({ ok: true }));
 
-// Serve index.html at root for same-origin frontend
+// Serve Jeopardy.html as the main app
+const JEOPARDY_FILE = path.join(__dirname, 'Jeopardy.html');
+
+// Root goes to Jeopardy
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(JEOPARDY_FILE);
+});
+
+// Friendly aliases
+app.get([
+  '/jeopardy',
+  '/Jeopardy',
+  '/Jeopardy.html',
+  '/Jeoparty.html', // common typo
+  '/Jeopardy-Speech34',
+  '/Jeopardy-Speech34.html'
+], (req, res) => {
+  res.sendFile(JEOPARDY_FILE);
+});
+
+// Catch-all: send Jeopardy.html for SPA-style routes, but do not
+// override direct asset requests (paths with file extensions)
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path === '/health') return next();
+  if (path.extname(req.path)) return next();
+  return res.sendFile(JEOPARDY_FILE);
 });
 
 app.listen(PORT, () => {

@@ -47,6 +47,13 @@
     const username = new FormData(form).get('u').trim();
     if (!username) return;
 
+    // Reflect the username in the URL for deep-linking
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('username', username);
+      history.replaceState(null, '', url);
+    } catch (_) {}
+
     out.innerHTML = '<p class="muted">Loading…</p>';
     try {
       const r = await fetch(`/api/user?username=${encodeURIComponent(username)}`);
@@ -393,6 +400,22 @@
       out.innerHTML = `<div class="card"><p>Unexpected error.</p><pre class="value">${String(err)}</pre></div>`;
     }
   });
+
+  // On load: if ?username= or ?u= is present, prefill and auto-search
+  (function initFromQuery() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const q = (params.get('username') || params.get('u') || '').trim();
+      if (q) {
+        document.getElementById('u').value = q;
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          form.dispatchEvent(new Event('submit'));
+        }
+      }
+    } catch (_) {}
+  })();
   </script>
 </body>
 </html>

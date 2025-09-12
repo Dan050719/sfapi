@@ -1,0 +1,967 @@
+        let categories = [];
+        let totalClues = 0;
+        let players = [];
+        let currentControlIndex = 0;
+        let results = [];
+        let currentClue = null;
+        let chooser = null;
+        let buzzer = null;
+        let isDailyDouble = false;
+        let wager = 0;
+        let buzzed = false;
+        let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let introAudio = null; // background intro music
+        let clapAudio = null;  // applause for correct answers
+        let awwAudio = null;   // disappointment sound for incorrect answers
+        const values = [200, 400, 600, 800, 1000];
+        const highestValue = 1000;
+        let prevButtons = [];
+        const fileInput = document.getElementById('file-input');
+        const startGameButton = document.getElementById('start-game');
+        const loadSampleButton = document.getElementById('load-sample');
+        const randomGameButton = document.getElementById('random-game');
+        const willieModeButton = document.getElementById('willie-mode');
+        const playerSetup = document.getElementById('player-setup');
+        const numPlayersSelect = document.getElementById('num-players');
+        const generatePlayerForms = document.getElementById('generate-player-forms');
+        const playerForms = document.getElementById('player-forms');
+        const startGameAfterSetup = document.getElementById('start-game-after-setup');
+        const uploadSection = document.getElementById('upload-section');
+        const boardSection = document.getElementById('board-section');
+        const questionSection = document.getElementById('question-section');
+        const resultSection = document.getElementById('result-section');
+        const boardDiv = document.getElementById('board');
+        const playerScoresDiv = document.getElementById('player-scores');
+        const streakDiv = document.getElementById('streak');
+        const questionValue = document.getElementById('question-value');
+        const questionText = document.getElementById('question-text');
+        const buzzPanel = document.getElementById('buzz-panel');
+        const choicesDiv = document.getElementById('choices');
+        const feedback = document.getElementById('feedback');
+        const submitAnswerButton = document.getElementById('submit-answer');
+        const readAloudButton = document.getElementById('read-aloud');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const reportDiv = document.getElementById('report');
+        const restartButton = document.getElementById('restart');
+        const downloadResultsButton = document.getElementById('download-results');
+        const dailyDoubleModal = document.getElementById('daily-double-modal');
+        const wagerInput = document.getElementById('wager-input');
+        const modalConfirm = document.getElementById('modal-confirm');
+        startGameButton.addEventListener('click', loadGame);
+        if (loadSampleButton) {
+            loadSampleButton.addEventListener('click', loadSample);
+        }
+        randomGameButton.addEventListener('click', loadRandom);
+        if (willieModeButton) {
+            willieModeButton.addEventListener('click', loadWillie);
+        }
+        generatePlayerForms.addEventListener('click', generateForms);
+        startGameAfterSetup.addEventListener('click', setupPlayers);
+        submitAnswerButton.addEventListener('click', handleSubmitAnswer);
+        restartButton.addEventListener('click', restartGame);
+        downloadResultsButton.addEventListener('click', downloadResults);
+        modalConfirm.addEventListener('click', confirmWager);
+        readAloudButton.addEventListener('click', readQuestionAloud);
+        function speakHostDialogue(text) {
+            return new Promise((resolve) => {
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.volume = 1;
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    let resolved = false;
+                    utterance.onend = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            resolve();
+                        }
+                    };
+                    utterance.onerror = () => {
+                        if (!resolved) {
+                            resolved = true;
+                            resolve();
+                        }
+                    };
+                    speechSynthesis.speak(utterance);
+                    setTimeout(() => {
+                        if (!resolved) {
+                            resolved = true;
+                            resolve();
+                        }
+                    }, 15000);
+                } else {
+                    resolve();
+                }
+            });
+        }
+        function generateForms() {
+            playerForms.innerHTML = '';
+            const num = parseInt(numPlayersSelect.value);
+            for (let i = 0; i < num; i++) {
+                const formDiv = document.createElement('div');
+                formDiv.classList.add('player-form');
+                formDiv.innerHTML = '<label>Name:</label><input type="text" id="player-name-' + i + '" value="Player ' + (i + 1) + '"><label>Is AI?</label><input type="checkbox" id="is-ai-' + i + '">';
+                playerForms.appendChild(formDiv);
+            }
+            speakHostDialogue("Forms are ready! Enter each player's name and indicate if they are an AI contestant. When complete, click 'Start Game' to proceed to the board.");
+        }
+        function setupPlayers() {
+            const num = parseInt(numPlayersSelect.value);
+            players = [];
+            for (let i = 0; i < num; i++) {
+                const name = document.getElementById('player-name-' + i).value;
+                const isAI = document.getElementById('is-ai-' + i).checked;
+                players.push({ name: name, isAI: isAI, score: 0, streak: 0, bestStreak: 0 });
+            }
+            playerSetup.style.display = 'none';
+            boardSection.style.display = 'block';
+            currentControlIndex = 0;
+            buildPlayerScores();
+            buildBoard();
+            if ('getGamepads' in navigator) {
+                console.log('Gamepad API supported');
+                window.addEventListener('gamepadconnected', function(e) {
+                    console.log('Gamepad connected at index %d: %s.', e.gamepad.index, e.gamepad.id);
+                    pollGamepads();
+                });
+                window.addEventListener('gamepaddisconnected', function(e) {
+                    console.log('Gamepad disconnected from index %d: %s', e.gamepad.index, e.gamepad.id);
+                });
+                pollGamepads();
+            }
+            speakHostDialogue(players[0].name + ', you have control. Select a clue from one of our ' + categories.length + ' categories to begin.');
+        }
+        function pollGamepads() {
+            requestAnimationFrame(pollGamepads);
+            if (!('getGamepads' in navigator)) return;
+            const gamepads = navigator.getGamepads();
+            const gp = Array.from(gamepads).find(function(p) { return p; });
+            if (!gp) return;
+            const buttons = gp.buttons;
+            const prev = prevButtons;
+            prevButtons = buttons.map(function(b) { return b.pressed; });
+            for (let i = 0; i < Math.min(4, buttons.length); i++) {
+                if (buttons[i].pressed && (!prev || !prev[i])) {
+                    if (buzzPanel.style.display !== 'none' && !buzzed) {
+                        const humanIndex = players.findIndex(function(p) { return !p.isAI; });
+                        if (humanIndex !== -1) {
+                            buzzPlayer(humanIndex);
+                        }
+                    } else if (choicesDiv.style.display !== 'none' && questionSection.style.display !== 'none') {
+                        const letter = String.fromCharCode(65 + i);
+                        const choice = choicesDiv.querySelector('.choice[data-letter="' + letter + '"]');
+                        if (choice) {
+                            choice.click();
+                        }
+                    }
+                }
+            }
+            if (buttons.length > 9 && buttons[9].pressed && (!prev || !prev[9]) && submitAnswerButton.style.display !== 'none') {
+                submitAnswerButton.click();
+            }
+        }
+        function buildPlayerScores() {
+            playerScoresDiv.innerHTML = '';
+            players.forEach(function(p, i) {
+                const div = document.createElement('div');
+                div.classList.add('player-score');
+                div.dataset.index = i;
+                div.innerHTML = '<span>' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small>';
+                playerScoresDiv.appendChild(div);
+            });
+            updateControlHighlight();
+        }
+        function updatePlayerScores() {
+            document.querySelectorAll('.player-score').forEach(function(d) {
+                const i = parseInt(d.dataset.index);
+                const p = players[i];
+                d.innerHTML = '<span>' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small>';
+            });
+        }
+        function updateControlHighlight() {
+            document.querySelectorAll('.player-score').forEach(function(d) { d.classList.remove('control'); });
+            const controlDiv = document.querySelector('.player-score[data-index="' + currentControlIndex + '"]');
+            if (controlDiv) controlDiv.classList.add('control');
+        }
+        function playSound(type) {
+            function playNote(frequency, waveform, duration, delay) {
+                if (delay === undefined) delay = 0;
+                setTimeout(function() {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = waveform;
+                    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.01);
+                    oscillator.start(audioCtx.currentTime);
+                    setTimeout(function() {
+                        gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.01);
+                        setTimeout(function() { oscillator.stop(); }, 20);
+                    }, duration - 20);
+                }, delay);
+            }
+            if (type === 'correct') {
+                playNote(523.25, 'sine', 150, 0);
+                playNote(659.25, 'sine', 150, 150);
+                playNote(783.99, 'sine', 200, 300);
+                // Also play clapping sound effect
+                try {
+                    if (!clapAudio) {
+                        clapAudio = new Audio('clapping.mp3');
+                        clapAudio.volume = 0.9;
+                    }
+                    clapAudio.currentTime = 0;
+                    clapAudio.play().catch(function(err){ console.warn('Applause audio prevented:', err); });
+                } catch (e) {
+                    console.warn('Unable to play clapping sound:', e);
+                }
+            } else if (type === 'incorrect') {
+                playNote(392.00, 'sawtooth', 150, 0);
+                playNote(329.63, 'sawtooth', 200, 150);
+                // Also play "aww" sound effect
+                try {
+                    if (!awwAudio) {
+                        awwAudio = new Audio('aww.mp3');
+                        awwAudio.volume = 0.9;
+                    }
+                    awwAudio.currentTime = 0;
+                    awwAudio.play().catch(function(err){ console.warn('Aww audio prevented:', err); });
+                } catch (e) {
+                    console.warn('Unable to play aww sound:', e);
+                }
+            } else if (type === 'daily_double') {
+                playNote(440, 'square', 200, 0);
+                playNote(440, 'square', 200, 250);
+                playNote(440, 'square', 300, 500);
+            }
+        }
+        function streakMessage(n) {
+            if (n >= 10) return 'Unstoppable!';
+            if (n >= 8) return 'Legendary!';
+            if (n >= 6) return 'Untouchable!';
+            if (n >= 5) return 'Blazing!';
+            if (n >= 4) return 'On fire!';
+            if (n >= 3) return 'Heating up!';
+            if (n >= 2) return 'Two in a row!';
+            return '';
+        }
+        function updateStreak(isCorrect, player) {
+            let streakMsg = '';
+            if (isCorrect) {
+                player.streak++;
+                if (player.streak > player.bestStreak) player.bestStreak = player.streak;
+                streakMsg = streakMessage(player.streak);
+                if (streakMsg) {
+                    speakHostDialogue(player.name + ' is ' + streakMsg + ' with ' + player.streak + ' correct answers in a row!');
+                }
+            } else {
+                if (player.streak >= 3) {
+                    speakHostDialogue(player.name + ', streak ended at ' + player.streak + '.');
+                }
+                player.streak = 0;
+            }
+            updatePlayerScores();
+        }
+        function loadGame() {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please upload a file first.');
+                return;
+            }
+            // Play intro audio once when user starts loading a game
+            try {
+                if (!introAudio) {
+                    introAudio = new Audio('jeopardy-intro-with-host-introduction.mp3');
+                    introAudio.loop = false; // set true to loop, if desired
+                    introAudio.volume = 0.8;
+                }
+                introAudio.currentTime = 0;
+                introAudio.play().catch(function(err){ console.warn('Audio play prevented:', err); });
+            } catch (e) {
+                console.warn('Unable to start intro audio:', e);
+            }
+            console.log('File selected:', file.name, 'Size:', file.size);
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                let content = event.target.result;
+                console.log('Raw content length:', content.length);
+                content = content.replace(/```/g, '').replace(/&lt;/g, '').replace(/&gt;/g, '').replace(/<[^>]*>/g, '').trim();
+                console.log('Sanitized content preview:', content.substring(0, 100) + '...');
+                parseCategoriesAndClues(content);
+                totalClues = categories.reduce(function(sum, cat) { return sum + cat.clues.length; }, 0);
+                console.log('Parsed categories:', categories);
+                console.log('Total clues:', totalClues);
+                console.log('Valid check:', categories.length > 0 && categories.every(function(cat) { return cat.clues.length > 0; }));
+                if (categories.length > 0 && categories.every(function(cat) { return cat.clues.length > 0; })) {
+                    uploadSection.style.display = 'none';
+                    playerSetup.style.display = 'block';
+                    speakHostDialogue("Welcome to Jeopardy! Prepare to test your knowledge in this exciting game of answers and questions. It's time to assemble our contestants! Select the number of players, from one to four, and click 'Generate Forms' to enter their names and AI status.");
+                    alert('Parsed successfully: ' + categories.length + ' categories, ' + totalClues + ' clues.');
+                } else {
+                    alert('Invalid file: ' + categories.length + ' categories parsed, but validation failed. Check console for details.');
+                }
+            };
+            reader.onerror = function() {
+                console.error('File read error:', reader.error);
+                alert('Error reading file. Check console.');
+            };
+            reader.readAsText(file);
+        }
+        function loadRandom() {
+            // Play intro audio when using Random
+            try {
+                if (!introAudio) {
+                    introAudio = new Audio('jeopardy-intro-with-host-introduction.mp3');
+                    introAudio.loop = false;
+                    introAudio.volume = 0.8;
+                }
+                introAudio.currentTime = 0;
+                introAudio.play().catch(function(err){ console.warn('Audio play prevented:', err); });
+            } catch (e) {
+                console.warn('Unable to start intro audio:', e);
+            }
+            fetch('questions.txt')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(function(content) {
+                    console.log('Raw content length from questions.txt:', content.length);
+                    content = content.replace(/```/g, '').replace(/&lt;/g, '').replace(/&gt;/g, '').replace(/<[^>]*>/g, '').trim();
+                    console.log('Sanitized content preview from questions.txt:', content.substring(0, 100) + '...');
+                    parseCategoriesAndClues(content);
+                    console.log('Parsed all categories from questions.txt:', categories.length);
+                    if (categories.length < 6) {
+                        alert('Not enough categories in questions.txt. Found ' + categories.length + ', need at least 6.');
+                        return;
+                    }
+                    
+                    // --- Start of Revised Section ---
+                    // Shuffle all parsed categories using the Fisher-Yates algorithm for a true random selection.
+                    const shuffledCategories = [...categories]; // Create a copy to shuffle.
+                    for (let i = shuffledCategories.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        // Swap elements at indices i and j.
+                        [shuffledCategories[i], shuffledCategories[j]] = [shuffledCategories[j], shuffledCategories[i]];
+                    }
+
+                    // Select the first 6 categories from the now-shuffled array.
+                    categories = shuffledCategories.slice(0, 6);
+                    // --- End of Revised Section ---
+
+                    totalClues = categories.reduce(function(sum, cat) { return sum + cat.clues.length; }, 0);
+                    console.log('Selected 6 random categories:', categories.map(function(c) { return c.name; }));
+                    console.log('Total clues after selection:', totalClues);
+                    if (categories.every(function(cat) { return cat.clues.length > 0; })) {
+                        uploadSection.style.display = 'none';
+                        playerSetup.style.display = 'block';
+                        speakHostDialogue("Welcome to Jeopardy! Six random categories have been selected from the question database. Prepare to test your knowledge in this exciting game of answers and questions. It's time to assemble our contestants! Select the number of players, from one to four, and click 'Generate Forms' to enter their names and AI status.");
+                        alert('Random loaded successfully: ' + categories.length + ' categories, ' + totalClues + ' clues.');
+                    } else {
+                        alert('Invalid categories selected from questions.txt. Check console for details.');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading questions.txt:', error);
+                    alert('Error loading questions.txt: ' + error.message + '. Ensure the file exists in the same directory as this HTML file and is accessible.');
+                });
+        }
+        function loadWillie() {
+            // Play intro audio when using Willie Mode
+            try {
+                if (!introAudio) {
+                    introAudio = new Audio('jeopardy-intro-with-host-introduction.mp3');
+                    introAudio.loop = false;
+                    introAudio.volume = 0.8;
+                }
+                introAudio.currentTime = 0;
+                introAudio.play().catch(function(err){ console.warn('Audio play prevented:', err); });
+            } catch (e) {
+                console.warn('Unable to start intro audio:', e);
+            }
+            fetch('Willie.txt')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('HTTP error! status: ' + response.status);
+                    }
+                    return response.text();
+                })
+                .then(function(content) {
+                    console.log('Raw content length from Willie.txt:', content.length);
+                    content = content.replace(/```/g, '').replace(/&lt;/g, '').replace(/&gt;/g, '').replace(/<[^>]*>/g, '').trim();
+                    console.log('Sanitized content preview from Willie.txt:', content.substring(0, 100) + '...');
+                    parseCategoriesAndClues(content);
+                    console.log('Parsed all categories from Willie.txt:', categories.length);
+                    if (categories.length < 6) {
+                        alert('Not enough categories in Willie.txt. Found ' + categories.length + ', need at least 6.');
+                        return;
+                    }
+                    // Shuffle and select 6 categories like Random
+                    const shuffledCategories = [...categories];
+                    for (let i = shuffledCategories.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffledCategories[i], shuffledCategories[j]] = [shuffledCategories[j], shuffledCategories[i]];
+                    }
+                    categories = shuffledCategories.slice(0, 6);
+                    totalClues = categories.reduce(function(sum, cat) { return sum + cat.clues.length; }, 0);
+                    console.log('Selected 6 Willie categories:', categories.map(function(c) { return c.name; }));
+                    console.log('Total clues after selection:', totalClues);
+                    if (categories.every(function(cat) { return cat.clues.length > 0; })) {
+                        uploadSection.style.display = 'none';
+                        playerSetup.style.display = 'block';
+                        speakHostDialogue("Welcome to Jeopardy! Willie Mode is loaded. Prepare to test your knowledge in this exciting game of answers and questions. Select the number of players and click 'Generate Forms' to continue.");
+                        alert('Willie Mode loaded successfully: ' + categories.length + ' categories, ' + totalClues + ' clues.');
+                    } else {
+                        alert('Invalid categories selected from Willie.txt. Check console for details.');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading Willie.txt:', error);
+                    alert('Error loading Willie.txt: ' + error.message + '. Ensure the file exists alongside the HTML file.');
+                });
+        }
+        function loadSample() {
+            console.log('Loading sample data');
+            const sampleContent = 'CATEGORY | Proxy Functions\nMC_SINGLE | In the context of the proxy function, what is the term for the employee on whose behalf the proxy is acting? | A. Proxy User | B. Delegate | C. Account Holder | D. Granted User | B';
+            parseCategoriesAndClues(sampleContent);
+            totalClues = categories.reduce(function(sum, cat) { return sum + cat.clues.length; }, 0);
+            console.log('Sample parsed categories:', categories);
+            uploadSection.style.display = 'none';
+            playerSetup.style.display = 'block';
+            speakHostDialogue("Welcome to Jeopardy! Prepare to test your knowledge in this exciting game of answers and questions. Excellent choice! The sample data has been loaded, featuring a category on Proxy Functions. Now, let's proceed to set up the players.");
+            alert('Sample loaded: ' + categories.length + ' categories, ' + totalClues + ' clues.');
+        }
+        function parseCategoriesAndClues(content) {
+            console.log('Starting parse with content length:', content.length);
+            categories = [];
+            let currentCategory = null;
+            const lines = content.split('\n');
+            console.log('Number of lines:', lines.length);
+            lines.forEach(function(line, lineIndex) {
+                if (line.trim() === '') return; // Skip empty lines
+                let parts = line.split('|').map(function(part) {
+                    let cleaned = part.trim().replace(/```/g, '').replace(/&lt;/g, '').replace(/&gt;/g, '').replace(/<[^>]*>/g, '');
+                    return cleaned;
+                }).filter(function(part) { return part.length > 0; });
+                console.log('Line ' + lineIndex + ':', line, '-> Parts:', parts);
+                if (parts.length < 2) return;
+                const type = parts[0].toUpperCase();
+                if (type === 'CATEGORY') {
+                    if (currentCategory) categories.push(currentCategory);
+                    currentCategory = { name: parts[1], clues: [] };
+                    console.log('New category:', parts[1]);
+                } else if (currentCategory && ['MC_SINGLE', 'MC_MULTI', 'TF'].includes(type)) {
+                    const question = parts[1];
+                    let correct = parts[parts.length - 1].trim().toUpperCase();
+                    let choices = {};
+                    if (type === 'TF') {
+                        if (parts.length !== 3) return;
+                        choices = { T: 'True', F: 'False' };
+                        if (!['T', 'F'].includes(correct)) return;
+                    } else if (type === 'MC_SINGLE' || type === 'MC_MULTI') {
+                        const numChoices = parts.length - 3;
+                        if (numChoices < 2) return;
+                        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+                        for (let i = 0; i < numChoices; i++) {
+                            let choiceText = parts[2 + i];
+                            choiceText = choiceText.replace(/^[A-Z][ .):]+/i, '').trim();
+                            choices[letters[i]] = choiceText;
+                        }
+                        console.log('Choices parsed:', choices);
+                        if (type === 'MC_SINGLE') {
+                            if (!Object.keys(choices).includes(correct)) return;
+                        } else {
+                            const corrects = correct.split(',').map(function(c) { return c.trim().toUpperCase(); }).filter(function(c) { return c; });
+                            if (corrects.length === 0 || corrects.some(function(c) { return !Object.keys(choices).includes(c); })) return;
+                            correct = corrects;
+                        }
+                    } else {
+                        return;
+                    }
+                    currentCategory.clues.push({ type: type, question: question, choices: choices, correct: correct, answered: false });
+                    console.log('Clue added to category');
+                }
+            });
+            if (currentCategory) categories.push(currentCategory);
+            categories.forEach(function(cat) {
+                cat.clues.forEach(function(clue, index) {
+                    clue.value = values[index] || 200;
+                });
+            });
+            console.log('Final parsed categories:', categories.length);
+            categories.forEach((cat, idx) => console.log(`Category ${idx}: ${cat.name} with ${cat.clues.length} clues`));
+        }
+        function buildBoard() {
+            boardDiv.innerHTML = '';
+            const numCols = categories.length;
+            const mid = Math.ceil(numCols / 2);
+            function createSubboard(cats, offset) {
+                if (offset === undefined) offset = 0;
+                const sub = document.createElement('div');
+                sub.classList.add('subboard');
+                sub.style.setProperty('--subcols', cats.length);
+                cats.forEach(function(cat) {
+                    const catDiv = document.createElement('div');
+                    catDiv.classList.add('category');
+                    catDiv.textContent = cat.name;
+                    sub.appendChild(catDiv);
+                });
+                for (let row = 0; row < 5; row++) {
+                    cats.forEach(function(cat, localCol) {
+                        let clue = null;
+                        if (row < cat.clues.length) {
+                            clue = cat.clues[row];
+                        }
+                        const clueDiv = document.createElement('div');
+                        clueDiv.classList.add('clue');
+                        if (clue) {
+                            clueDiv.textContent = '$' + clue.value;
+                            const globalCol = offset + localCol;
+                            clueDiv.dataset.cat = globalCol;
+                            clueDiv.dataset.row = row;
+                            if (clue.answered) {
+                                clueDiv.classList.add('answered');
+                            } else {
+                                clueDiv.addEventListener('click', function() {
+                                    if (!players[currentControlIndex].isAI) selectClue(globalCol, row);
+                                });
+                            }
+                        } else {
+                            clueDiv.classList.add('answered');
+                            clueDiv.textContent = '';
+                        }
+                        sub.appendChild(clueDiv);
+                    });
+                }
+                return sub;
+            }
+            let boardBuilt = false;
+            if (numCols <= 3) {
+                const sub = createSubboard(categories, 0);
+                boardDiv.appendChild(sub);
+                boardBuilt = true;
+            } else {
+                const leftCats = categories.slice(0, mid);
+                const rightCats = categories.slice(mid);
+                const left = createSubboard(leftCats, 0);
+                const right = createSubboard(rightCats, mid);
+                boardDiv.appendChild(left);
+                boardDiv.appendChild(right);
+                boardBuilt = true;
+            }
+            if (boardBuilt) {
+                setTimeout(function() {
+                    const catElems = document.querySelectorAll('.category');
+                    let maxH = 0;
+                    catElems.forEach(function(el) {
+                        el.style.height = 'auto';
+                        maxH = Math.max(maxH, el.offsetHeight);
+                    });
+                    catElems.forEach(function(el) {
+                        el.style.height = maxH + 'px';
+                    });
+                }, 0);
+            }
+            if (players[currentControlIndex].isAI) {
+                speakHostDialogue(players[currentControlIndex].name + ' is in control and will select a clue momentarily. Stand by for their choice!');
+                setTimeout(function() {
+                    const available = [];
+                    categories.forEach(function(cat, col) {
+                        for (let r = 0; r < cat.clues.length; r++) {
+                            if (!cat.clues[r].answered) available.push({ col: col, row: r });
+                        }
+                    });
+                    if (available.length > 0) {
+                        const rand = available[Math.floor(Math.random() * available.length)];
+                        selectClue(rand.col, rand.row);
+                    }
+                }, 2000 + Math.random() * 2000);
+            }
+        }
+        function selectClue(catIndex, row) {
+            const cat = categories[catIndex];
+            currentClue = cat.clues[row];
+            currentClue.answered = true;
+            chooser = players[currentControlIndex];
+            isDailyDouble = Math.random() < 0.1;
+            const maxWager = Math.max(chooser.score, highestValue);
+            if (isDailyDouble) {
+                playSound('daily_double');
+                speakHostDialogue("It's a Daily Double! " + chooser.name + ", you may wager any amount from $5 up to $" + maxWager + ". Enter your wager now.");
+                if (chooser.isAI) {
+                    wager = Math.round((5 + Math.random() * (maxWager - 5)) / 10) * 10;
+                    speakHostDialogue(chooser.name + " wagered $" + wager + "! Here's your Daily Double question in " + cat.name + ".");
+                    setTimeout(function() { showQuestion(true); }, 2000);
+                } else {
+                    wagerInput.max = maxWager;
+                    wagerInput.value = 5;
+                    dailyDoubleModal.style.display = 'flex';
+                }
+            } else {
+                wager = currentClue.value;
+                speakHostDialogue("You've chosen " + cat.name + " for $" + currentClue.value + ". Get ready to buzz in when the question appears!");
+                showQuestion(false);
+            }
+        }
+        function confirmWager() {
+            wager = parseInt(wagerInput.value);
+            const maxWager = Math.max(chooser.score, highestValue);
+            if (isNaN(wager) || wager < 5 || wager > maxWager) {
+                alert('Invalid wager. Must be between $5 and $' + maxWager + '.');
+                return;
+            }
+            dailyDoubleModal.style.display = 'none';
+            speakHostDialogue("Wager confirmed at $" + wager + "! Here's your Daily Double question in " + categories.find(function(cat) { return cat.clues.includes(currentClue); }).name + ".");
+            showQuestion(true);
+        }
+        function showQuestion(isDD) {
+            if (isDD === undefined) isDD = false;
+            boardSection.style.display = 'none';
+            questionSection.style.display = 'block';
+            questionValue.textContent = isDailyDouble ? 'Daily Double - Wager: $' + wager : '$' + currentClue.value;
+            questionText.textContent = currentClue.question;
+            choicesDiv.innerHTML = '';
+            choicesDiv.style.display = 'none';
+            feedback.textContent = '';
+            submitAnswerButton.style.display = 'none';
+            readAloudButton.style.display = 'block';
+            buzzPanel.style.display = 'none';
+            const letters = Object.keys(currentClue.choices).sort();
+            letters.forEach(function(letter) {
+                const choiceDiv = document.createElement('div');
+                choiceDiv.classList.add('choice');
+                choiceDiv.textContent = letter + ': ' + currentClue.choices[letter];
+                choiceDiv.dataset.letter = letter;
+                choiceDiv.addEventListener('click', function() {
+                    if (buzzer && buzzer.isAI) return;
+                    if (currentClue.type === 'MC_MULTI') {
+                        choiceDiv.classList.toggle('selected');
+                    } else {
+                        handleSingleSelect(letter, choiceDiv);
+                    }
+                });
+                choicesDiv.appendChild(choiceDiv);
+            });
+            speakHostDialogue(currentClue.question).then(function() {
+                if (isDailyDouble) {
+                    buzzer = chooser;
+                    showChoices().then(function() {
+                        if (buzzer.isAI) {
+                            setTimeout(simulateAIAnswer, 2000);
+                        }
+                    });
+                } else {
+                    showBuzzPanel();
+                    startBuzzTimer();
+                }
+            });
+        }
+        function showBuzzPanel() {
+            buzzPanel.innerHTML = '';
+            players.forEach(function(p, i) {
+                if (!p.isAI) {
+                    const btn = document.createElement('button');
+                    btn.classList.add('buzz-btn');
+                    btn.dataset.index = i;
+                    btn.textContent = 'Buzz as ' + p.name;
+                    btn.addEventListener('click', function() { buzzPlayer(i); });
+                    buzzPanel.appendChild(btn);
+                }
+            });
+            buzzPanel.style.display = 'block';
+        }
+        function startBuzzTimer() {
+            buzzed = false;
+            const hasAI = players.some(function(p) { return p.isAI; });
+            // Determine a fair window for buzzing in.
+            // - With AI: keep prior behavior (~8s total)
+            // - Humans only: extend window based on question length so players have time to read
+            const text = (questionText && questionText.textContent) ? questionText.textContent : '';
+            const words = text.trim().length ? text.trim().split(/\s+/).length : 0;
+            const humanWindow = Math.min(20000, Math.max(10000, words * 350)); // 10s–20s or ~350ms/word
+            const duration = hasAI ? 8000 : humanWindow;
+            setTimeout(function() {
+                if (!buzzed) {
+                    const aiIndices = players.map(function(p, i) { return p.isAI ? i : null; }).filter(function(x) { return x !== null; });
+                    if (aiIndices.length > 0) {
+                        const randomAI = aiIndices[Math.floor(Math.random() * aiIndices.length)];
+                        buzzPlayer(randomAI);
+                    } else {
+                        const correctLetters = Array.isArray(currentClue.correct) ? currentClue.correct.join(', ') : currentClue.correct;
+                        const correctFull = Array.isArray(currentClue.correct) ? currentClue.correct.map(function(l) { return currentClue.choices[l]; }).join(', ') : currentClue.choices[currentClue.correct];
+                        speakHostDialogue("Time's up! No one buzzed in. The correct answer is " + correctFull + ". " + players[currentControlIndex].name + ", you're still in control.").then(function() {
+                            playSound('incorrect');
+                            setTimeout(returnToBoard, 1000);
+                        });
+                    }
+                }
+            }, duration);
+        }
+        function buzzPlayer(index) {
+            if (buzzed) return;
+            buzzed = true;
+            buzzer = players[index];
+            buzzPanel.style.display = 'none';
+            let dialogue = buzzer.name + ' buzzes in! Please select your answer now.';
+            if (buzzer.isAI) {
+                dialogue += " Let's see the options to choose from.";
+            }
+            speakHostDialogue(dialogue).then(function() {
+                if (buzzer.isAI) {
+                    showChoices().then(function() {
+                        setTimeout(simulateAIAnswer, 1000);
+                    });
+                } else {
+                    showChoices();
+                }
+            });
+        }
+        function showChoices() {
+            choicesDiv.style.display = 'block';
+            let choicesText = "Here are your options: ";
+            const letters = Object.keys(currentClue.choices).sort();
+            letters.forEach(function(letter) {
+                choicesText += letter + ': ' + currentClue.choices[letter] + '. ';
+            });
+            choicesText += currentClue.type === 'MC_MULTI' ? "Select all that apply and submit." : "Select your answer.";
+            if (currentClue.type === 'MC_MULTI' && buzzer && !buzzer.isAI) {
+                submitAnswerButton.style.display = 'block';
+            }
+            return speakHostDialogue(choicesText);
+        }
+        function simulateAIAnswer() {
+            const probCorrect = 0.7;
+            let isCorrect = Math.random() < probCorrect;
+            let selected;
+            const correct = currentClue.correct;
+            const type = currentClue.type;
+            const choiceKeys = Object.keys(currentClue.choices);
+            if (isCorrect) {
+                selected = type === 'MC_MULTI' ? [...correct] : correct;
+            } else {
+                if (type === 'TF') {
+                    selected = correct === 'T' ? 'F' : 'T';
+                } else if (type === 'MC_SINGLE') {
+                    const wrong = choiceKeys.filter(function(l) { return l !== correct; });
+                    selected = wrong[Math.floor(Math.random() * wrong.length)];
+                } else {
+                    let numSelect = Math.floor(Math.random() * (choiceKeys.length - 1)) + 1;
+                    let selectedArr = [];
+                    while (selectedArr.length === 0 || selectedArr.sort().join(',') === correct.sort().join(',')) {
+                        selectedArr = choiceKeys.sort(function() { return 0.5 - Math.random(); }).slice(0, numSelect);
+                    }
+                    selected = selectedArr;
+                }
+            }
+            if (type !== 'MC_MULTI') {
+                const choiceDiv = choicesDiv.querySelector('.choice[data-letter="' + selected + '"]');
+                if (choiceDiv) choiceDiv.classList.add('selected');
+            } else {
+                selected.forEach(function(s) {
+                    const choiceDiv = choicesDiv.querySelector('.choice[data-letter="' + s + '"]');
+                    if (choiceDiv) choiceDiv.classList.add('selected');
+                });
+            }
+            processAnswer(isCorrect, type === 'MC_MULTI' ? selected.join(',') : selected, buzzer);
+        }
+        function handleSingleSelect(selected, selectedDiv) {
+            const choices = choicesDiv.querySelectorAll('.choice');
+            choices.forEach(function(choice) {
+                choice.style.pointerEvents = 'none';
+                choice.classList.remove('selected');
+            });
+            selectedDiv.classList.add('selected');
+            const isCorrect = selected === currentClue.correct;
+            processAnswer(isCorrect, selected, buzzer);
+        }
+        function handleSubmitAnswer() {
+            const selected = Array.from(choicesDiv.querySelectorAll('.choice.selected'))
+                .map(function(d) { return d.dataset.letter; })
+                .sort();
+            const correctArr = Array.isArray(currentClue.correct) ? [...currentClue.correct].sort() : [currentClue.correct];
+            const isCorrect = selected.length === correctArr.length && selected.every(function(v, i) { return v === correctArr[i]; });
+            processAnswer(isCorrect, selected.join(','), buzzer);
+        }
+        function processAnswer(isCorrect, selected, player) {
+            const choices = choicesDiv.querySelectorAll('.choice');
+            choices.forEach(function(choice) {
+                choice.style.pointerEvents = 'none';
+            });
+            submitAnswerButton.style.display = 'none';
+            readAloudButton.style.display = 'none';
+            const effectiveValue = isDailyDouble ? wager : currentClue.value;
+            player.score += isCorrect ? effectiveValue : -effectiveValue;
+            const correctFullText = Array.isArray(currentClue.correct) ? currentClue.correct.map(function(s) { return currentClue.choices[s]; }).join(', ') : currentClue.choices[currentClue.correct];
+            let speechPromise;
+            if (isCorrect) {
+                speechPromise = speakHostDialogue("That's correct! " + player.name + " earns $" + effectiveValue + " and retains control of the board.");
+                feedback.textContent = 'Correct!';
+                feedback.style.color = '#00FF00';
+                playSound('correct');
+                currentControlIndex = players.indexOf(player);
+            } else {
+                const buzzerIndex = players.indexOf(player);
+                const newControlIndex = (buzzerIndex + 1) % players.length;
+                currentControlIndex = newControlIndex;
+                speechPromise = speakHostDialogue("I'm sorry, that's incorrect. The correct answer" + (Array.isArray(currentClue.correct) ? 's are' : ' is') + " " + correctFullText + ". " + players[currentControlIndex].name + ", you now have control.");
+                feedback.textContent = "Incorrect. The correct answer" + (Array.isArray(currentClue.correct) ? 's are' : ' is') + " " + correctFullText + ".";
+                feedback.style.color = '#FF0000';
+                playSound('incorrect');
+            }
+            updateControlHighlight();
+            const correctLetters = Array.isArray(currentClue.correct) ? currentClue.correct : [currentClue.correct];
+            const selectedLetters = typeof selected === 'string' ? selected.split(',') : [selected];
+            choices.forEach(function(choice) {
+                const letter = choice.dataset.letter;
+                if (selectedLetters.includes(letter)) {
+                    if (correctLetters.includes(letter)) {
+                        choice.classList.add('correct');
+                    } else {
+                        choice.classList.add('incorrect');
+                    }
+                } else if (correctLetters.includes(letter)) {
+                    choice.classList.add('correct');
+                }
+            });
+            results.push({
+                player: player.name,
+                category: categories.find(function(cat) { return cat.clues.includes(currentClue); }).name,
+                value: currentClue.value,
+                question: currentClue.question,
+                selected: selected,
+                correct: Array.isArray(currentClue.correct) ? currentClue.correct.join(',') : currentClue.correct,
+                selectedText: typeof selected === 'string' ? selected.split(',').map(function(s) { return currentClue.choices[s.trim()]; }).join(', ') : currentClue.choices[selected],
+                correctText: correctFullText,
+                isCorrect: isCorrect
+            });
+            updateStreak(isCorrect, player);
+            updatePlayerScores();
+            speechPromise.then(function() {
+                setTimeout(returnToBoard, 1000);
+            });
+        }
+        function returnToBoard() {
+            questionSection.style.display = 'none';
+            boardSection.style.display = 'block';
+            buildBoard();
+            if (results.length === totalClues) {
+                speakHostDialogue("That's the end of the game! Let's review the final scores and see how our contestants performed.");
+                showResults();
+            }
+        }
+        function showResults() {
+            questionSection.style.display = 'none';
+            boardSection.style.display = 'none';
+            resultSection.style.display = 'block';
+            finalScoreDisplay.textContent = 'Final Scores:';
+            const playerReports = {};
+            players.forEach(function(p) {
+                playerReports[p.name] = { correct: [], incorrect: [], score: p.score, bestStreak: p.bestStreak };
+            });
+            results.forEach(function(r) {
+                if (r.isCorrect) {
+                    playerReports[r.player].correct.push(r);
+                } else {
+                    playerReports[r.player].incorrect.push(r);
+                }
+            });
+            reportDiv.innerHTML = '';
+            Object.keys(playerReports).forEach(function(name) {
+                const rep = playerReports[name];
+                const playerSection = document.createElement('div');
+                playerSection.innerHTML = '<h3>' + name + ' - Score: $' + rep.score + ' (Best Streak: ' + rep.bestStreak + ')</h3>';
+                const correctSection = document.createElement('div');
+                correctSection.classList.add('report-section');
+                const correctHeader = document.createElement('h4');
+                correctHeader.textContent = 'Correct Answers:';
+                correctSection.appendChild(correctHeader);
+                const correctList = document.createElement('div');
+                rep.correct.forEach(function(r) {
+                    const item = document.createElement('div');
+                    item.classList.add('report-item', 'report-correct');
+                    item.innerHTML = '<strong>' + r.category + ' - $' + r.value + ':</strong> ' + r.question + '<br><strong>Answer:</strong> ' + r.selected + ': ' + r.selectedText;
+                    correctList.appendChild(item);
+                });
+                correctSection.appendChild(correctList);
+                playerSection.appendChild(correctSection);
+                const incorrectSection = document.createElement('div');
+                incorrectSection.classList.add('report-section');
+                const incorrectHeader = document.createElement('h4');
+                incorrectHeader.textContent = 'Incorrect Answers:';
+                incorrectSection.appendChild(incorrectHeader);
+                const incorrectList = document.createElement('div');
+                rep.incorrect.forEach(function(r) {
+                    const item = document.createElement('div');
+                    item.classList.add('report-item', 'report-incorrect');
+                    item.innerHTML = '<strong>' + r.category + ' - $' + r.value + ':</strong> ' + r.question + '<br><strong>Answer:</strong> ' + (r.selected || 'None') + ': ' + r.selectedText + '<br><strong>Correct:</strong> ' + r.correct + ': ' + r.correctText;
+                    incorrectList.appendChild(item);
+                });
+                incorrectSection.appendChild(incorrectList);
+                playerSection.appendChild(incorrectSection);
+                reportDiv.appendChild(playerSection);
+            });
+            const standings = players.map(function(p) { return p.name + ': $' + p.score; }).join(', ');
+            const winner = players.reduce(function(a, b) { return a.score > b.score ? a : b; });
+            speakHostDialogue('Here are the final standings: ' + standings + '. Congratulations to our top scorer, ' + winner.name + '! Download your results or restart for another round!');
+        }
+        function downloadResults() {
+            let reportContent = 'Jeopardy Results\n\n';
+            players.forEach(function(p) {
+                reportContent += p.name + ' Final Score: $' + p.score + '\n';
+                reportContent += 'Best streak: ' + p.bestStreak + '\n\n';
+            });
+            reportContent += 'Details:\n';
+            results.forEach(function(r) {
+                reportContent += r.player + ' - ' + r.category + ' - $' + r.value + ': ' + r.question + '\n';
+                reportContent += ' Answer: ' + (r.selected || 'None') + ': ' + r.selectedText + '\n';
+                if (!r.isCorrect) {
+                    reportContent += ' Correct: ' + r.correct + ': ' + r.correctText + '\n';
+                }
+                reportContent += '\n';
+            });
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'jeopardy_results.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        function restartGame() {
+            resultSection.style.display = 'none';
+            uploadSection.style.display = 'block';
+            fileInput.value = '';
+            categories = [];
+            totalClues = 0;
+            players = [];
+            results = [];
+            feedback.textContent = '';
+            dailyDoubleModal.style.display = 'none';
+            playerSetup.style.display = 'none';
+            boardSection.style.display = 'none';
+            prevButtons = [];
+            // Stop intro audio when restarting
+            if (introAudio) {
+                try { introAudio.pause(); introAudio.currentTime = 0; } catch (e) {}
+            }
+            speakHostDialogue("Welcome back to Jeopardy! Prepare to test your knowledge in this exciting game of answers and questions. Please upload your pipe-delimited questions file or select 'Load Sample Data' to begin.");
+        }
+        function readQuestionAloud() {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(questionText.textContent);
+                utterance.lang = 'en-US';
+                utterance.volume = 1;
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        }

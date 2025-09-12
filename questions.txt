@@ -1,0 +1,338 @@
+CATEGORY | SAP SuccessFactors History & Modules - HRM Four Pillars
+MC_SINGLE | Which is NOT one of the four HRM pillars SuccessFactors covers? | Recruiting | Learning & Development | Marketing Automation | Performance Management | C
+MC_MULTI | Which are part of the four HRM pillars? (Select all that apply) | Compensation | Performance | Recruiting | Supply Chain | A,B,C
+TF | Compensation management is part of the HRM pillars. | T
+MC_SINGLE | Learning & Development in SuccessFactors is also known as: | LMS | CareerBuilder | CloudCentral | ERP L&D | A
+MC_MULTI | Which areas extend beyond the four pillars? (Select all that apply) | Onboarding | Time & Attendance | Workforce Planning | People Analytics | A,B,C,D
+CATEGORY | SAP SuccessFactors History & Modules - Platform Architecture
+MC_SINGLE | Which platform area includes Admin Center? | Technology | Administration | User Experience | Integration | B
+TF | Metadata Framework is part of Administration capabilities. | F
+MC_MULTI | Which belong to User Experience capabilities? (Select all that apply) | Action Search | People Profile | Mobile | Photos | A,B,C,D
+MC_SINGLE | Execution Manager belongs to which area? | Monitoring | Analytics | Payroll | Recruiting | A
+MC_MULTI | Which are Administration capabilities? (Select all that apply
+CATEGORY | SAP SuccessFactors History & Modules - Founding & Acquisition
+MC_SINGLE | Who founded SuccessFactors in 2001? | Larry Ellison | Lars Dalgaard | Hasso Plattner | Bill McDermott | B
+MC_MULTI | What year did SAP acquire SuccessFactors? (Select all that apply) | 2010 | 2011 | 2012 | 2015 | B,C
+TF | SAP acquired SuccessFactors to expand its cloud expertise. | T
+MC_SINGLE | SuccessFactors started as what type of software? | On-prem HRIS | SaaS performance management | Payroll-only | CRM | B
+MC_MULTI | Which benefits came from SAP acquiring SuccessFactors? (Select all that apply) | Cloud HCM suite | Better payroll hardware | Expanded SaaS expertise | Fiori-based UI integration | A,C,D
+CATEGORY | SAP SuccessFactors History & Modules - Evolution of Modules
+MC_SINGLE | Which of these modules was added after SAP acquired SuccessFactors? | Recruiting Marketing | Compensation | Learning | Performance Management | A
+TF | SuccessFactors originally launched with a full HCM suite in 2001. | F
+MC_MULTI | Which modules belong to talent management? (Select all that apply) | Recruiting | Learning | Performance | Compensation | A,B,C,D
+MC_SINGLE | In 2019, which area received functionality updates? | Payroll | Recruiting solution | Supply chain | Finance | B
+MC_MULTI | Which tools were expanded in later years? (Select all that apply) | Workforce Analytics | Onboarding | ERP Financials | Recruiting Posting | A,B,D
+CATEGORY | SAP SuccessFactors History & Modules - HRM Four Pillars
+MC_SINGLE | Which is NOT one of the four HRM pillars SuccessFactors covers? | Recruiting | Learning & Development | Marketing Automation | Performance Management | C
+MC_MULTI | Which are part of the four HRM pillars? (Select all that apply) | Compensation | Performance | Recruiting | Supply Chain | A,B,C
+TF | Compensation management is part of the HRM pillars. | T
+MC_SINGLE | Learning & Development in SuccessFactors is also known as: | LMS | CareerBuilder | CloudCentral | ERP L&D | A
+MC_MULTI | Which areas extend beyond the four pillars? (Select all that apply) | Onboarding | Time & Attendance | Workforce Planning | People Analytics | A,B,C,D
+CATEGORY | SAP SuccessFactors History & Modules - Platform Architecture
+MC_SINGLE | Which platform area includes Admin Center? | Technology | Administration | User Experience | Integration | B
+TF | Metadata Framework is part of Administration capabilities. | F
+MC_MULTI | Which belong to User Experience capabilities? (Select all that apply) | Action Search | People Profile | Mobile | Photos | A,B,C,D
+MC_SINGLE | Execution Manager belongs to which area? | Monitoring | Analytics | Payroll | Recruiting | A
+MC_MULTI | Which are Administration capabilities? (Select all that apply) | Security | Proxy Management | Intelligent Services | Role-Based Permissions | A,B,D
+CATEGORY | SAP SuccessFactors History & Modules - Best Practices for Implementation
+MC_SINGLE | A key best practice is to use: | Pure discovery design | Fit-to-standard with gap-fit | Custom code only | Ignore documentation | B
+MC_MULTI | Which practices are recommended? (Select all that apply) | Iterative gap-fit analysis | Maintain documentation | Skip admin training | Share docs on Jam site | A,B,D
+TF | Consultants should avoid giving administrators early training. | F
+MC_SINGLE | Which step ensures smooth go-live? | Staff cutover with detailed documentation | Skip testing | Ad-hoc design | Avoid gap-fit | A
+MC_MULTI | Which are key configuration best practices? (Select all that apply) | Change only what must be changed | Fit-to-standard | Document testing | Ignore upgrades | A,B,C
+CATEGORY | SAP SuccessFactors History & Modules - Module Integration & Analytics
+MC_SINGLE | Report Center belongs to which area? | People Analytics | Recruiting | Admin Center | Payroll | A
+TF | People Analytics includes standard report templates. | T
+MC_MULTI | Which features are part of People Analytics? (Select all that apply) | Report Center | Standard Reports | Intelligent Services | Ad-hoc payroll reports | A,B
+MC_SINGLE | Intelligent Services belong to which platform area? | User Experience | Administration | Integration/Services | Security | C
+MC_MULTI | Which modules integrate with analytics? (Select all that apply) | Recruiting | Learning | Performance | Compensation | A,B,C,D
+CATEGORY | SAP SuccessFactors History & Modules - Mobile Evolution & Fiori UI
+MC_SINGLE | The Horizon theme is based on: | SAP NetWeaver | SAP Fiori | Oracle Cloud | SuccessFactors Classic | B
+MC_MULTI | Which mobile features are standard? (Select all that apply) | To-Do List | Org Chart | Quick Actions | Payroll Summary | A,B,C,D
+TF | The Horizon Fiori visual theme can be disabled. | F
+MC_SINGLE | SAP SuccessFactors mobile app start screen is: | Report Center | Home | Settings | Org Chart | B
+MC_MULTI | Which updates were introduced with SAP Fiori UI? (Select all that apply) | Modular design | Mobile-first approach | Legacy GUI | Modern UX | A,B,D
+CATEGORY | SAP SuccessFactors History & Modules - Upgrade Management & Release Cycles
+MC_SINGLE | Upgrade Center helps manage: | System upgrades | Payroll runs | Performance reviews | Employee goals | A
+TF | Upgrade management is module-specific only. | F
+MC_MULTI | Which tasks does Upgrade Center support? (Select all that apply) | Apply patches | Enable features | Track releases | Manage upgrades | A,B,C,D
+MC_SINGLE | Which is a key benefit of structured releases? | Predictability | Random changes | No documentation | Custom-only design | A
+MC_MULTI | Which upgrade strategies are recommended? (Select all that apply) | Scheduled releases | Documented cutovers | Uncontrolled updates | Controlled testing | A,B,D
+CATEGORY | Home Page & User Experience - Navigation Menus
+MC_SINGLE | What is the main navigation menu in SAP SuccessFactors called? | Taskbar | Navigation Menu | Action Menu | Command Bar | B
+MC_MULTI | Which menus are available on the SAP SuccessFactors home page? (Select all that apply) | Navigation Menu | Name Dropdown | Action Search | Payroll Console | A,B,C
+TF | The Navigation Menu always shows the same options regardless of user role. | F
+MC_SINGLE | Where is the Navigation Menu located? | Lower right corner | Upper left corner | Center | Footer | B
+MC_MULTI | Which features are accessed from the Name Dropdown Menu? (Select all that apply) | Proxy as another user | Settings | Admin Center | Log out | A,B,C,D
+CATEGORY | Home Page & User Experience - Quick Actions
+MC_SINGLE | What is the maximum number of quick actions visible on the home page? | 8 | 10 | 16 | 20 | C
+MC_MULTI | Which are examples of quick actions? (Select all that apply) | My Team | Report Center | Clock Time | View Admin Alerts | A,B,C,D
+TF | Administrators cannot hide quick actions from the home page. | F
+MC_SINGLE | Which quick action enables you to assign someone to handle workflows temporarily? | Org Chart | Delegate Workflows | My Team | View Team Absences | B
+MC_MULTI | Which quick actions are always visible by default? (Select all that apply) | Favorites | Saved for Later | My Profile | Report Center | A,B
+CATEGORY | Home Page & User Experience - Cards & Customization
+MC_SINGLE | How many custom cards can appear on a home page for one user? | 10 | 16 | 20 | 25 | B
+MC_MULTI | Which elements can be customized on cards? (Select all that apply) | Title | Subtitle | Thumbnail image | Target behavior | A,B,C,D
+TF | You can only disable card types that are listed on Manage Card Settings. | T
+MC_SINGLE | What happens when a card type is disabled? | It becomes invisible immediately | All existing cards are deleted automatically | It can only be hidden from mobile | You must delete cards using a scheduled job | D
+MC_MULTI | Which target behaviors can be configured for custom cards? (Select all that apply) | Popover | URL | E-mail | JavaScript URL | A,B,C,D
+CATEGORY | Home Page & User Experience - Mobile Settings
+MC_SINGLE | Where do you enable mobile features in SAP SuccessFactors? | Mobile App | Device Settings | Enable Mobile Features in Action Search | Company Logo Settings | C
+MC_MULTI | Which mobile use cases are supported? (Select all that apply) | Time Off | Payroll Summary | Benefit Claims | Onboarding | A,B,C,D
+TF | SAP SuccessFactors mobile supports both iOS and Android. | T
+MC_SINGLE | What file can administrators export to see mobile users and devices? | .xml | .csv | .txt | .docx | B
+MC_MULTI | Which are sections in Enable Mobile Features? (Select all that apply) | Mobile Specific | Modules | Notifications | Payroll Servers | A,B,C
+CATEGORY | Home Page & User Experience - Theming & Text
+MC_SINGLE | Which tool manages themes? | Theme Center | Theme Manager | UI Configurator | Horizon Tool | B
+MC_MULTI | Which elements can be changed in Theme Manager Home Page settings? (Select all that apply) | Greeting text color | Quick action colors | Card icon colors | Card link colors | A,B,C,D
+TF | The Horizon Fiori theme can be disabled after 2H 2023. | F
+MC_SINGLE | Which tool allows replacement of system UI labels? | Text Replacement | Label Configurator | Language Editor | Theme Manager | A
+MC_MULTI | Which functions are provided by Text Replacement? (Select all that apply) | Override UI labels | Multilingual customization | Grammar correction | Company-specific terms | A,B,D
+CATEGORY | Home Page & User Experience - To-Do Panel & Alerts
+MC_SINGLE | Where are to-do alerts shown? | At the top of every page | On the footer | On a mobile-only widget | In Provisioning | A
+MC_MULTI | Which are features of the to-do panel? (Select all that apply) | Shows pending items | Opens from checkmark icon | Can act from any page | Only shows overdue items | A,B,C
+TF | The to-do panel can only be enabled in Provisioning. | F
+MC_SINGLE | Which option enables the to-do panel? | Company Systems and Logo Settings | Provisioning Company Settings | Manage Languages | Theme Manager | A
+MC_MULTI | Which tasks may appear as to-do alerts? (Select all that apply) | Learning Assignments | 360 Reviews | Compliance Tasks | Payroll Run | A,B,C
+CATEGORY | Home Page & User Experience - For You Today & Manager Experience
+MC_SINGLE | Content in "For You Today" is ordered by: | Random choice | Urgency and value | Alphabetical | Admin preference | B
+MC_MULTI | Which types of reminders may managers see on the home page? (Select all that apply) | Birthdays | Work Anniversaries | Pending Tasks | Payroll Run Alerts | A,B,C
+TF | The My Team quick action allows managers to review and take actions on direct reports. | T
+MC_SINGLE | Which action is NOT supported by My Team quick action? | Change job information | View performance rating | Access development plan | Configure payroll server | D
+MC_MULTI | Which options are included in Manager Experience? (Select all that apply) | Approvals | Team Absences | Delegate Workflows | Org Chart | A,B,C,D
+CATEGORY | Home Page & User Experience - Custom Links & UI Integration Cards
+MC_SINGLE | What is the maximum number of custom cards administrators can configure in Manage Home Page? | 50 | 100 | 200 | 500 | B
+MC_MULTI | Which UI integration cards can be added as of 1H 2023? (Select all that apply) | Compensation Statement | Spot Award Congratulations | Onboarding Guide | Activity | A,B,C,D
+TF | Custom links in Favorites must be visible to all users. | F
+MC_SINGLE | What happens if a custom card has a web link not supported on mobile? | It is replaced by default | It is hidden on mobile apps | It causes an error | It is disabled for all users | B
+MC_MULTI | Which attributes can administrators configure for custom links? (Select all that apply) | Target groups | Localized link name | Localized description | System password | A,B,C
+CATEGORY | User Data File & Employee Import - UDF Structure
+MC_SINGLE | What file format is used for the User Data File (UDF)? | .txt | .csv | .xml | .json | B
+MC_MULTI | Which are required UDF fields? (Select all that apply) | STATUS | USERID | FIRSTNAME | LASTNAME | A,B,C,D
+TF | The USERID field can be changed after it is set. | F
+MC_SINGLE | What value is used for employees at the top of the hierarchy in the MANAGER column? | ROOT_MANAGER | CEO | NO_MANAGER | NULL | C
+MC_MULTI | Which standard filters exist in the UDF? (Select all that apply) | Department | Division | Location | Payroll | A,B,C
+CATEGORY | User Data File & Employee Import - Import/Export Process
+MC_SINGLE | Which Admin Center tool is used to import employees when Employee Central is NOT enabled? | Employee Import | Manage Users | Employee Central Admin | User Export | A
+MC_MULTI | Which methods can be used to import the UDF? (Select all that apply) | Admin Center | FTP automation | Manual entry | Email | A,B
+TF | Importing through FTP automatically validates and fixes all errors. | F
+MC_SINGLE | Which export option allows only active users? | Short Format | Valid Users Only | Batch Export | Encoding Export | B
+MC_MULTI | Which options are available during export? (Select all that apply) | Character Encoding | Batch Processing | Short Format | Timezone Overrides | A,B,C
+CATEGORY | User Data File & Employee Import - File Behavior
+MC_SINGLE | What happens if a USERID in the UDF does not exist in the system? | It is ignored | It creates a new user | It deletes existing user | It disables the account | B
+MC_MULTI | Which statements about file behavior are true? (Select all that apply) | Matching USERIDs update existing users | New USERIDs create users | Missing USERIDs make no changes | Empty fields auto-delete records | A,B,C
+TF | Uploading a UDF always overwrites all employee data in the system. | F
+MC_SINGLE | What field must be edited to inactivate a user? | USERID | STATUS | MANAGER | HR | B
+MC_MULTI | Which actions are valid with UDF imports? (Select all that apply) | Add new users | Update records | Inactivate users | Purge users by default | A,B,C
+CATEGORY | User Data File & Employee Import - Extended User Info
+MC_SINGLE | Which is NOT a type of extended user information? | Personal | Trend | Background | Payroll Ledger | D
+MC_MULTI | Which are examples of extended user information? (Select all that apply) | Personal info | Trend ratings | Background data | HR master payroll | A,B,C
+TF | Extended user information can be exported and imported separately. | T
+MC_SINGLE | Which tool is used to manage background data imports? | Manage Users | Import Extended User Information | Provisioning Only | Execution Manager | B
+MC_MULTI | Which steps are recommended before manual import of profile data? (Select all that apply) | Export backup first | Validate file | Overwrite without saving | Correct errors | A,B,D
+CATEGORY | User Data File & Employee Import - IDs & Identifiers
+MC_SINGLE | What identifier uniquely represents a person in Employee Central? | User ID | UUID | Person ID | Assignment ID | C
+MC_MULTI | Which identifiers are system-generated? (Select all that apply) | UUID | User ID | Person ID | Assignment ID | A,B,D
+TF | Assignment IDs can be changed directly in Admin Center by managers. | F
+MC_SINGLE | What is the relationship between Person ID and User ID? | One-to-many | One-to-one | Many-to-many | None | A
+MC_MULTI | Which identifiers are visible in the UI? (Select all that apply) | Person ID | User ID | Assignment ID | UUID | A,B,C
+CATEGORY | User Data File & Employee Import - Assignment ID vs User ID vs Person ID
+MC_SINGLE | Which identifier is case-sensitive and visible in UI? | User ID | Person ID | Assignment ID | UUID | C
+MC_MULTI | Which identifiers are used for system integration? (Select all that apply) | User ID | Assignment ID | UUID | Payroll Code | A,B,C
+TF | UUIDs are visible to all end users on the UI. | F
+MC_SINGLE | Which identifier is generated at the database level only? | Person ID | UUID | User ID | Assignment ID | B
+MC_MULTI | Which statements about Person ID are true? (Select all that apply) | Unique identifier of a natural person | Remains stable over time | Linked one-to-one with UUID | Visible in UI by default | A,B,C
+CATEGORY | User Data File & Employee Import - Inactivating & Reactivating Users
+MC_SINGLE | Which STATUS value is used to deactivate a user? | Closed | Inactive | Disabled | Locked | B
+MC_MULTI | Which are results of inactivating a user? (Select all that apply) | Account frozen | Cannot make changes | Still in database | Auto deleted | A,B,C
+TF | Inactive users can always be imported back without restrictions. | F
+MC_SINGLE | Which tool option can update inactive employees during import? | Process inactive employees | Validate inactive employees | Batch reactivation | Auto import | A
+MC_MULTI | Which options exist for reactivation? (Select all that apply) | Import file with active status | Manual reactivation | Purge inactive then re-add | Change status in Admin Center | A,B,D
+CATEGORY | User Data File & Employee Import - Static vs Dynamic User Management
+MC_SINGLE | Which group type updates automatically when employee data changes? | Static | Dynamic | Manual | Fixed | B
+MC_MULTI | Which are characteristics of static groups? (Select all that apply) | Manual membership | CSV import required | Auto-refreshes with HRIS changes | Can be edited in UI | A,B,D
+TF | Dynamic groups can include up to four People Pools. | T
+MC_SINGLE | Which Admin Center tool is used to create dynamic groups? | Manage Permission Groups | Manage Users | Manage Employees | Provisioning | A
+MC_MULTI | Which modifications can be applied to permission groups? (Select all that apply) | Rename group | Change conditions | Add members | Exclude members | A,B,C,D
+CATEGORY | Metadata Framework & Business Rules - MDF Overview
+MC_SINGLE | What does MDF stand for in SuccessFactors? | Managed Data Framework | Metadata Framework | Meta Data Files | Modular Data Foundation | B
+MC_MULTI | Which are capabilities of MDF? (Select all that apply) | Create custom objects | Import/export records | Workflow integration | Payroll engine | A,B,C
+TF | MDF can only be used for standard objects and not for custom ones. | F
+MC_SINGLE | Which SuccessFactors applications are built using MDF? | Position Management, Time Off, BCUI | Payroll, ERP, CRM | Recruiting, Finance, Supply Chain | LMS only | A
+MC_MULTI | Which data volumes can be tracked in MDF? (Select all that apply) | Audit Data | Association Data | Transactional Data | Payroll Data | A,B,C
+CATEGORY | Metadata Framework & Business Rules - Object Definitions
+MC_SINGLE | What prefix is automatically added to custom MDF objects? | cust_ | obj_ | md_ | sf_ | A
+MC_MULTI | Which options exist for Effective Dating in MDF? (Select all that apply) | None | Basic | Multiple Changes Per Day | From Parent | A,B,C,D
+TF | Object associations cannot be configured in MDF. | F
+MC_SINGLE | What determines if an MDF object can be read and updated via API? | Object Category | API Visibility | Business Rule | External Code | B
+MC_MULTI | Which statuses are available for MDF objects? (Select all that apply) | Active | Inactive | Draft | Locked | A,B
+CATEGORY | Metadata Framework & Business Rules - Permissions for MDF
+MC_SINGLE | Which framework controls access to MDF objects? | Role-Based Permissions | Payroll Authorizations | Admin Center Defaults | Security Console | A
+MC_MULTI | Which RBP permissions are specific to MDF? (Select all that apply) | Configure Object Definitions | Manage Data | Configure Business Rules | Payroll Override | A,B,C
+TF | Field level overrides can restrict access on specific MDF fields. | T
+MC_SINGLE | Where are MDF import/export permissions enabled? | Provisioning | Admin Center → Manage Permission Roles | Theme Manager | Instance Home Page | B
+MC_MULTI | Which permissions can be granted under Miscellaneous Permissions for MDF? (Select all that apply) | View data | Edit data | Import/export | Create workflows | A,B,C
+CATEGORY | Metadata Framework & Business Rules - Business Rules
+MC_SINGLE | What tool is used to create business rules? | Check Tool | Rules Engine | Workflow Manager | Data Volume Tool | B
+MC_MULTI | Which types of rules exist in SuccessFactors? (Select all that apply) | Validate | Save | Post Save | On Load | A,B,C,D
+TF | Warning messages from save rules are shown before workflow confirmation messages. | T
+MC_SINGLE | Which rule type is triggered when a field value changes? | Validate | Initialize | onChange | Delete | C
+MC_MULTI | Which are examples of rule use cases? (Select all that apply) | Workflow routing | Data propagation | Calculations | Validation | A,B,C,D
+CATEGORY | Metadata Framework & Business Rules - People Profile Integration
+MC_SINGLE | What requirement must be met for an MDF object to be used in People Profile? | External Code must be User data type | Must be Active | Must be API visible | Must be Effective Dated | A
+MC_MULTI | Which steps are needed to add a custom MDF block to People Profile? (Select all that apply) | Create a Configuration UI | Save UI | Configure People Profile | Drag block to profile section | A,B,C,D
+TF | Live Profile MDF blocks can be used only with objects that have externalCode of User type. | T
+MC_SINGLE | Which tool allows creation of a UI for MDF objects? | Manage Configuration UI | Manage Data | Provisioning | Theme Manager | A
+MC_MULTI | Which areas can managers access from My Team quick action? (Select all that apply) | Goal Plan | Development Plan | Performance Matrix | Payroll Ledger | A,B,C
+CATEGORY | Metadata Framework & Business Rules - Effective Dating & API Visibility
+MC_SINGLE | Which Effective Dating option allows only one record at a time? | None | Basic | Multiple Changes Per Day | From Parent | A
+MC_MULTI | Which Effective Dating options allow multiple records? (Select all that apply) | Basic | Multiple Changes Per Day | From Parent | None | B,C
+TF | API Visibility of "Editable" allows both read and write access. | T
+MC_SINGLE | Which API sub version is recommended for new objects? | No Selection | V1.0 | V1.1 | V2.0 | C
+MC_MULTI | Which Effective Dating option ties child object records to the parent? (Select all that apply) | From Parent | Basic | None | Parent-Linked | A
+CATEGORY | Metadata Framework & Business Rules - Associations & Relationships
+MC_SINGLE | Which relationship type can a Division have with a Business Unit? | One to One | One to Many | Many to Many | None | B
+MC_MULTI | Which types of associations exist in MDF? (Select all that apply) | One to One | One to Many | Parent to Child | Payroll Only | A,B,C
+TF | An object instance for a child object can only be maintained with its parent object. | T
+MC_SINGLE | Which is an example of One to One association? | Division to Business Unit | Location to Geozone | Department to Employees | User to Job Codes | B
+MC_MULTI | Which statements are true about associations? (Select all that apply) | Define relationships between objects | Can involve Foundation objects | May be hierarchical | Only work for Payroll | A,B,C
+CATEGORY | Metadata Framework & Business Rules - Configuring Custom Objects (Company Car Example)
+MC_SINGLE | What is the code used for the Company Car object in the example? | car_obj | comp_car | car_generic | cust_car | B
+MC_MULTI | Which fields were included in the Company Car object? (Select all that apply) | Employee Name | Model | Year | Purchase Date | A,B,C,D
+TF | The Company Car object example required Pending Data = Yes. | F
+MC_SINGLE | Which field type was assigned to externalCode in the Company Car object? | String | User | Date | Integer | B
+MC_MULTI | Which permissions were granted for the Company Car object? (Select all that apply) | View Current | Create | Delete | Import/Export | A,B,C,D
+CATEGORY | HRIS Synchronization & Permissions - HRIS Sync Basics
+MC_SINGLE | HRIS Sync is what type of process? | Bidirectional | Unidirectional | Manual only | Peer-to-peer | B
+MC_MULTI | Which activities are handled by HRIS Sync? (Select all that apply) | Scheduled jobs | Field mappings | Triggered updates | Payroll processing | A,B,C
+TF | HRIS Sync allows data to flow back from SuccessFactors to the HRIS. | F
+MC_SINGLE | Which tool is used to monitor HRIS Sync jobs? | Execution Manager | Provisioning | Admin Center → Manage Users | Report Center | A
+MC_MULTI | Which events can trigger HRIS Sync? (Select all that apply) | Data imports | Scheduled jobs | Manual triggers | Mobile app login | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - Hard-Coded vs Custom Sync
+MC_SINGLE | Some HRIS fields are mapped by default. These are called: | Hard-coded mappings | Custom mappings | API mappings | Generic objects | A
+MC_MULTI | Which examples are hard-coded fields? (Select all that apply) | Username | Manager | HR Rep | Division | A,B,C
+TF | Custom mappings can be configured in Business Configuration UI (BCUI). | T
+MC_SINGLE | Which tool is used for XML-based field mapping changes? | Provisioning | Admin Center | Upgrade Center | Theme Manager | A
+MC_MULTI | Which statements are true about HRIS Sync mappings? (Select all that apply) | Hard-coded fields cannot be changed | Custom fields can be mapped | BCUI supports mapping | All mappings editable in UI only | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - Employee Self-Service
+MC_SINGLE | ESS allows employees to: | Manage security roles | Update personal info | Configure workflows | Reset payroll | B
+MC_MULTI | Which data can employees typically update via ESS? (Select all that apply) | Address | Phone number | Emergency contacts | Payroll engine | A,B,C
+TF | Employees always have access to edit any field in their profile. | F
+MC_SINGLE | Which permission controls ESS capabilities? | Role-Based Permissions | Payroll Permissions | Support Access | Admin Rights | A
+MC_MULTI | Which ESS functions may require workflow approval? (Select all that apply) | Address change | Contact update | Dependent addition | Benefit claim | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - Manager Self-Service
+MC_SINGLE | MSS allows managers to: | Run payroll | Initiate workflows for their teams | Configure provisioning | Change backend settings | B
+MC_MULTI | Which actions are possible with MSS? (Select all that apply) | Approve workflows | Edit direct report info | View team org chart | Reset company instance | A,B,C
+TF | MSS permissions are controlled through workflows and RBP. | T
+MC_SINGLE | MSS is commonly used for: | Managing payroll | Approving leave requests | Configuring system upgrades | Uploading templates | B
+MC_MULTI | Which permissions define MSS scope? (Select all that apply) | Role-Based Permissions | Workflow assignments | Target population | Payroll overrides | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - Workflow Management
+MC_SINGLE | Workflows define what? | Sequence of payroll steps | Approval processes | Export templates | Company IDs | B
+MC_MULTI | Which workflow participants are possible? (Select all that apply) | Approver | CC Role | Contributor | Employee | A,B,C,D
+TF | A workflow must always include at least one approver. | T
+MC_SINGLE | Which workflow type sends a copy without action rights? | Approver | CC Role | Contributor | Escalation | B
+MC_MULTI | Which are workflow events? (Select all that apply) | Skip | Delegate | Escalate | Cancel | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - Workflow Participants & Dynamic Roles
+MC_SINGLE | Which dynamic role represents the employee’s manager? | Manager | HR | Matrix Manager | Custom Manager | A
+MC_MULTI | Which roles are hierarchical? (Select all that apply) | Manager | Second Manager | HR Manager | Matrix Manager | A,B,C
+TF | Non-hierarchical roles include Matrix Manager and Custom Manager. | T
+MC_SINGLE | Which role can an employee have multiple of? | Manager | Second Manager | HR Manager | Matrix Manager | D
+MC_MULTI | Which statements are true about workflow participants? (Select all that apply) | Can be static or dynamic | Determine workflow routing | Always include payroll | Assigned through RBP | A,B,D
+CATEGORY | HRIS Synchronization & Permissions - Workflow Skip, Delegate & Escalation
+MC_SINGLE | Which workflow feature allows passing a step to another user? | Escalate | Skip | Delegate | Cancel | C
+MC_MULTI | Which options exist when a workflow is not completed? (Select all that apply) | Skip | Delegate | Escalate | Terminate user | A,B,C
+TF | Escalation can be configured to trigger after a certain time. | T
+MC_SINGLE | What happens if a workflow step is skipped? | It is auto-approved | It ends workflow | It deletes request | It locks user | A
+MC_MULTI | Which participants can be reassigned using delegation? (Select all that apply) | Approvers | Contributors | CC Roles | Payroll Clerks | A,B,C
+CATEGORY | HRIS Synchronization & Permissions - HRIS Sync Jobs & Mapping Strategies
+MC_SINGLE | Where are HRIS Sync jobs scheduled? | Admin Center | Provisioning → HRIS Sync | Upgrade Center | Check Tool | B
+MC_MULTI | Which options can be set in HRIS Sync job configuration? (Select all that apply) | Frequency | Target population | Notification recipients | Payroll overrides | A,B,C
+TF | HRIS Sync jobs can only be run manually. | F
+MC_SINGLE | Which job validates HRIS Sync mapping? | Check Tool → User Management | HRIS Sync Monitor | Execution Manager → HRIS Jobs | Data Validation Tool | C
+MC_MULTI | Which strategies ensure successful HRIS Sync? (Select all that apply) | Validate mappings | Monitor jobs | Correct errors | Automate scheduling | A,B,C,D
+CATEGORY | Test Questions 13
+MC_SINGLE | How should you build the IF condition to identity the user when the employee is updating their own Personal Information? | A. Option A | B. Option B | C. Option C | D. Option D | C
+MC_SINGLE | The HR admin has to change the salary of an employee, which will trigger a workflow for the employee's manager. The employee's manager should be able to edit the transaction if the proposed amount is NOT correct. Where in the workflow do you need to define this? Refer to the screenshot to answer the question | A. Edit Transaction | B. Respect Permission | C. Context | D. No Approver Behavior | A
+MC_SINGLE | When the manager updates the location of an employee, the HR admin must be the approver Note that the HR admin, manager, and HR Business Partner have access to change the location. How do you create the IF condition for the workflow derivation rule lo meet the above requirements? | A. Option A | B. Option B | C. Option C | D. Option D | A
+MC_SINGLE | An HR admin/Global Mobility person must create a transfer for an employee. The employee will be moving from Position A in Team A to Position B in Team B. Both managers will have to approve the transfer. How do you configure a two-step workflow so that the approval goes first to the current manager and second to the future manager? | A. By selecting in Step 1. Position Relationship - Parent Parent Position - Source • By selecting in Step 2: Position Relationship - Parent Position - Target | B. By selecting in Step 1: Role - Manager - Source • By selecting in Slep 2. Role-Manager Manager - Target | C. By selecting in Step 1. Role-Manager - Source • By selecting in Step 2: Role - Manager - Target | D. By selecting in Step 1. Role - Self-Source • By selecting in Step 2. Role- Manager - Target | C
+MC_SINGLE | This is a global customer and HR admins will be assigned based on legal entity. The HR admins should be getting approval workflows from their target population. How can you define this in one workflow? | A. Create dynamic groups per each legal entity and add the necessary approver steps. | B. Create a dynamic role using the Legal Entity filter and assign the Resolver type as dynamic group | C. Create permission groups for each legal entity and assign them to the HR admin role. | D. Create a dynamic role for each legal entity and assign the Resolver as the head of the legal entity. | B
+CATEGORY | Test Questions 14
+MC_SINGLE | Due to confidentiality reasons, when the HR Business Partner (maintained in Job Relationship) is creating a change in salary for an employee, this action will need to be approved by the manager of the HR Business Partner creating the request. How do you define this in the workflow when filling in the Approver Type, Approver Role, Context, and Relationship to Approver? Refer to the screenshot to answer the question | A. By selecting in Step 1: Role - Self-Source - Initiator | B. By selecting in Step 1: Role - Employee HR - Source - Employee | C. By selecting in Step 1: Role - Employee HR-Source- Initiator | D. By selecting in Step 1: Role - Manager - Source - Initiator | D
+MC_SINGLE | An employee will be changing their nationality information on their own How do you build the IF condition in the business rule so they can do this? | A. Option A | B. Option B | C. Option C | D. Option D | B
+MC_SINGLE | The employee is changing their marital status. Once the workflow is approved, the manager gets a notification via e-mail that this change has been processed. The manager then goes into the system and checks the workflow, but notices that they can see more fields than the ones for which they should receive a notification (Name, Marital Status, and Nationality) Why is that? | A. The manager has transactions pending approval permission for Personal Information. | B. There is a rule that sets up the visibility for the fields in Personal Information and this applies when checking the workflow. | C. In the workflow, Respect Permissions was set to No for the notification line to the manager. | D. The manager's approver context is set to Source | C
+MC_SINGLE | The manager has the ability to change the salary during the workflow Which of the following options do you need to select for a new workflow to be triggered when the manager edits the salary? | A. Edit without Route Change | B. Edit Attachment Only | C. No edit | D. Edit with Route Change | D
+MC_SINGLE | This is a global customer and HR admins will be assigned based on legal entity. The HR admins should be getting approval workflows from their target population. How can you define this in one workflow? | A. Create dynamic groups per each legal entity and add the necessary approver steps. | B. Create a dynamic role using the Legal Entity filter and assign the Resolver type as dynamic group | C. Create permission groups for each legal entity and assign them to the HR admin role. | D. Create a dynamic role for each legal entity and assign the Resolver as the head of the legal entity. | B
+CATEGORY | Test Questions 7
+MC_SINGLE | How do you trigger a business rule to populate the Standard Hours field from Legal Entity records in the Add New Employee wizard? | A. Event Type: onInit; Base Object: Standard Hours | B. Event Type: onChange; Base Object: Employee Information | C. Event Type: onEdit; Base Object: Employee Information | D. Event Type: onSave: Base Object: Legal Entity | B
+MC_MULTI | Which object supports &&NO_OVERWRITE&& in imports? Note: There are 2 correct answers to this question. (Select all that apply) | A. Job History | B. Job Relationships | C. Addresses | D. Employment Details | A,D
+MC_MULTI | Which events are NOT supported by event reason derivation? Note: There are 2 correct answers to this question. (Select all that apply) | A. Termination | B. Hire | C. Transfer | D. Data change | A,B
+MC_SINGLE | Your customer needs to set up a workflow to direct approval processes to the head of a business unit. Which approver type do you use? | A. Manager | B. Dynamic Group | C. Role | D. Dynamic Role | D
+MC_SINGLE | In which of the following HRIS elements do you assign workflow derivation rules for new hires? | A. Job Information | B. Personal Information | C. Biographical Information | D. Compensation Information | A
+CATEGORY | Test Questions 8
+MC_SINGLE | A customer has scheduled an HRIS sync job, which includes mapping of job titles, to run every Friday. On Tuesday, an employee's job title is changed via Manager Self-Service (MSS) to become effective on Thursday. When will the synchronization happen? | A. Saturday, the day after the sync job completes | B. Thursday, when the change becomes effective | C. Friday, when the sync job completes | D. Tuesday, the day the transaction is entered | C
+MC_MULTI | Where can you apply rule contexts? Note: There are 2 correct answers to this question. (Select all that apply) | A. onChange rules | B. onInit rules | C. onSave rules | D. onView rules | A,C
+MC_SINGLE | Which permission controls a user's access to the Edit button in the history of Job Information? | A. Edit Link > Edit/Insert | B. Job Information Actions > Edit/Insert | C. Job Information Actions > Correct | D. Job Information Actions > View History | C
+MC_SINGLE | What does it mean when a position is subjected to capacity control? | A. The target FTE is checked to prevent the position from being overstaffed. | B. The standard hours are checked to prevent the position from being overstaffed. | C. The target FTE is checked to prevent the position from being understaffed. | D. The standard hours are checked to prevent the position from being understaffed. | A
+MC_MULTI | Your customer would like to autogenerate the Position Code to avoid manual entry. Which of the following are prerequisites to achieve this requirement? Note: There are 3 correct answers to this question. (Select all that apply) | A. Set a Business Rule using the Rules for MDF Based Objects with the event type onSave and assign it in Position > code | B. Set a Business Rule using the Trigger Rules to Generate Assignment ID External with the event type onSave and assign it in Position > Save Rules | C. Set Position External Code Generation by On Save rule to Yes in Position Management Settings > General tab | D. Set a Business Rule using the Rules for MDF Based Objects with the event type onSave and assign it in Position > Save Rules | E. Set the Position Code field as read-only in the Position Object Definition | B,C,E
+CATEGORY | Test Questions 9
+MC_MULTI | What actions can you initiate from the Position Org chart? Note: There are 3 correct answers to this question. (Select all that apply) | A. Add a lower-level position | B. Nominate a successor for a position | C. Create a job requisition for a vacant position | D. Run a mass change to update positions | E. Mass copy positions | A,C,E
+MC_MULTI | Which of the following standard behaviors in Position Management can be set differently using Position Types? Note: There are 3 correct answers to this question. (Select all that apply) | A. Trigger workflows on Job Information if the position changes are synchronized to the incumbents | B. Respect workflow at Copy Position in Position Organizational Chart | C. Define a specific transition period for a group of positions | D. Transfer incumbents of the lower-level positions to a new manager if the current manager leaves their position | E. Set or reset TBH status if an incumbent's FTE is changed | A,B,E
+MC_MULTI | In which cases should the value for CREATE Respects Target Criteria be set to Yes in the Position object definition? Note: There are 2 correct answers to this question. (Select all that apply) | A. To restrict access to create positions based on the granted user's target population | B. To restrict access to create positions from Manage Positions | C. To restrict access to create lower-level positions from the Position Org Chart | D. To restrict access at the field level when creating positions | A,C
+MC_SINGLE | Where do you enable the Incumbent of Parent Position option to filter positions in Hire, MSS Job Information and History? | A. In Configure Object Definitions > Position | B. In Position Management Settings > UI Customizing | C. In Position Management Settings > Hierarchy Adaptation | D. In Manage Business Configuration > jobInfo | B
+MC_MULTI | Based on the screenshot below, can you identify any errors on the definition of the business rule to Default Position Attributes? Note: There are 2 correct answers to this question. (Select all that apply) | A. The workflow configuration should NOT be included in the business rule. | B. The Company field should NOT be included in the business rule. | C. The Parent Position field should NOT be included in the business rule. | D. The FTE field should be derived from the business rule to Calculate FTE based on Standard Hours. | C,D
+CATEGORY | Test Questions 10
+MC_MULTI | You have updated several position departments using Import and Export data, but the incumbent's data still shows the previous information for the department hris-field. What are some possible causes for this data inconsistency? Note: There are 2 correct answers to this question. (Select all that apply) | A. The technicalParameters value has NOT been set to SYNC in the position records. | B. The technicalParameters column with a value of SYNC has NOT been included in the import file. | C. The business rule to sync data changes sets the Position Department to be equal to Job Information.Department. | D. The business rule to sync data changes sets the Job Information.Department to be equal to Job Information.Position.Department. | B,C
+MC_MULTI | What are some of the position management application-specific rule scenarios? Note: There are 3 correct answers to this question. (Select all that apply) | A. Create Right to Return for Incumbent | B. Update Rule for Mass Change Run | C. Trigger Rules to Calculate Full-Time Equivalent | D. Trigger Rules for Off Cycle Event Batch | E. Derive Job Requisition Template in Recruiting Integration | A,B,C
+MC_SINGLE | Which of the following can you use to explore released APIs? | A. SAP Application Interface Framework | B. SAP Integration Suite | C. SAP Business Accelerator Hub | C
+MC_MULTI | Which of the following API types does SAP recommend to use to achieve clean core integrations? Note: There are 2 correct answers to this question. (Select all that apply) | A. IDoc | B. SOAP | C. RFC | D. Data | B,D
+MC_MULTI | Which of the following are features of the clean core dashboard? Note: There are 2 correct answers to this question. (Select all that apply) | A. It can be accessed by using SAP For Me. | B. Customers can grant access to the dashboard to partners. | C. Customers can use the dashboard in the dev, test, and production tenants. | D. It can be used in all SAP S/4HANA Cloud editions. | A,B
+CATEGORY | Test Questions 11
+MC_MULTI | What are some SAP recommended guiding principles to achieve clean core operations? Note: There are 3 correct answers to this question. (Select all that apply) | A. Integrate clean core practices in the end-to-end value process chain. | B. Define roles and responsibilities as part of a process transformation office. | C. Establish regular housekeeping tasks and procedures. | D. Establish an organizational structure, technical foundation, and transformation methodology for clean core. | E. Establish release management. | A,C,E
+MC_SINGLE | Which mathematical formula must be set in the THEN condition to meet the Jobinfo_FTE_Comp rule requirement? | A. (Base Salary/Previous FTE Value) X Current FTE Value | B. (Previous FTE Value - Current FTE Value) X Base Salary | C. (Base Salary/Current FTE Value) X Previous FTE Value | D. (Current FTE Value-Previous FTE Value)/Base Salary | A
+MC_SINGLE | How do you set the event date in Compensation Information for the jobinfo_FTE_Comp cross-entity rule? | A. Option A | B. Option B | C. Option C | D. Option D | D
+MC_SINGLE | What base object must you use for the Jobinfo_FTF_Comp rule? | A. Compensation Model | B. Job Information Model | C. Non Recurring Pay Component Model | D. Compensation Information Model | B
+MC_SINGLE | Which rule can effectively catch all unspecified events in a transaction? | A. Option A | B. Option B | C. Option C | D. Option D | B
+CATEGORY | Test Questions 12
+MC_SINGLE | In which order must you assign the rules? | A. ERD1, ERD2, ERD3, ERD-Catch, WFD | B. ERD1, ERD2, ERD3, WFD, ERD-Catch | C. WFD, ERD1, ERD2, ERD3, ERD-Catch | D. ERD-Calch, ERD1, ERD2, ERD3, WFD | A
+MC_SINGLE | Which clause meets the WFD_Address rule requirement? | A. Option A | B. Option B | C. Option C | D. Option D | D
+MC_SINGLE | Which rule supports the Default_JobClass requirement? | A. Option A | B. Option B | C. Option C | D. Option D | B
+MC_SINGLE | To which Job information field will you assign the Default_JobClass rule? | A. Employee Class | B. Job Title | C. Job Code | D. Pay Grade | C
+MC_SINGLE | An employee is changing their Last Name, so a CC workflow notification should be sent to their manager when is the CC workflow notification sent out? | A. When the approvers decline the workflow | B. When the employee initiates the workflow | C. When the workflow is sent back by any approver | D. When the workflow is approved by all approvers | D
+CATEGORY | Test Questions 1
+MC_MULTI | How are business rules handled in Employee Central Quick Actions? (Select all that apply) | A. The system supports all onSave rules. | B. onView rules are supported when the fields are included in the template. | C. onChange rules are supported when the fields are included in the template. | D. The system does NOT support onPostSave rules. | B,C
+MC_SINGLE | Where do you enable the Enter Manager to Filter Positions option to only display manager's lowerlevel positions in Hire, MSS Job Information and History? | A. In Settings > Ul Customizing | B. In Settings > Hierarchy Adaptation | C. In Manage Business Configuration > jobinfo | D. In Configure Object Definitions > Position | A
+MC_SINGLE | What association must you use when configuring a relationship between an MDF-based object and a Foundation Object wrapper? | A. Valid-When | B. Join By Column | C. One-to-one | D. Composite | D
+MC_SINGLE | You need to create a one-to-many association from Location to Legal Entity. You also need to configure filtering of the Location field based on the Company field in the Job Information block. What do you need to add to the data models? Note: There are 2 correct answers to this question. | A. <field-criteria> as part of <hris-field="company"> | B. <field-criteria> as part of <hris-field="location"> | C. <association> as part of <hris-element id="jobInfo"> | D. <association> as part of <hris-element id="location"> | B,D
+MC_SINGLE | Which method of modifying employee data will trigger an event reason derivation? | A. Inserting a new record in history UI | B. Using Actions menu in People Profile | C. Deleting a record in history UI | D. Using Add New Hire | B
+MC_SINGLE | Which method of modifying employee data will trigger an event reason derivation? | A. Inserting a new record in history UI | B. Using Actions menu in People Profile | C. Deleting a record in history UI | D. Using Add New Hire | B
+CATEGORY | Test Questions 2
+MC_MULTI | Which of the following are possible options when working with SAP SuccessFactors Employee Central employee identifiers? Note: There are 3 correct answers to this question. (Select all that apply) | A. Once generated, you CANNOT change a user id. | B. A user can have only one user id. | C. Once generated, you CANNOT change a person id external. | D. A user can have multiple user ids. | E. A user can have only one person id external. | A,D,E
+MC_SINGLE | In your project, the client asks for a mechanism by which a workflow can be approved by any one of a pool of people. What tool would you use to configure the group? | A. Manage Permission Groups | B. Manage Dynamic Roles | C. Manage Workflow Requests | D. Manage Workflow Groups | D
+MC_SINGLE | How do you enable a cost center in the Succession Data Model to be used as a filter in a permission group? | A. Go to <dg-filters> then add cost-center | B. Go to <hris-element="jobInfo"> then add dg-filter="true" | C. Go to <custom-filters> then add cost-center | D. Go to <hris-field id="cost-center"> then add filter="true" | A
+MC_SINGLE | A business rule triggers a transfer event reason when an employee's location is changed. Which base object would you use for this business rule? | A. Job Information | B. Employee Information Model | C. Job Information Model | D. Employee Information | C
+MC_MULTI | Which employment objects support a country-specific field configuration? Note: There are 2 correct answers to this question. (Select all that apply) | A. Job Relationship Info | B. Pay Component Recurring | C. Employment Details | D. Job Information | C,D
+CATEGORY | Test Questions 3
+MC_MULTI | Which steps are required to set up the Auto Delegation feature for a workflow in Employee Central? Note: There are 2 correct answers to this question. (Select all that apply) | A. Enable the field in Succession Data Model. | B. Enable the auto-delegate permission for users. | C. Define the delegate relationship in Employee Central. | D. Enable the field in the Corporate Data Model. | B,D
+MC_MULTI | Which fields must be enabled for the HRIS element payComponentNonRecurring? Note: There are 3 correct answers to this question. (Select all that apply) | A. value | B. pay-component-code | C. pay-date | D. frequency | E. is-target | A,B,C
+MC_MULTI | Which objects are supported in cross-entity business rules? Note: There are 2 correct answers to this question. (Select all that apply) | A. Pay Component Recurring | B. Work Permit Information | C. Personal Information | D. Job Information | A,D
+MC_SINGLE | A customer has scheduled an HRIS sync job, which includes mapping of job titles, to run every Friday. On Tuesday, an employee's job title is changed via Manager Self-Service (MSS) to become effective on Thursday. When will the synchronization happen? | A. Saturday, the day after the sync job completes | B. Thursday, when the change becomes effective | C. Friday, when the sync job completes | D. Tuesday, the day the transaction is entered | C
+MC_SINGLE | Which action in the THEN statement is used for propagation? | A. Execute | B. Raise | C. Set | D. Create | C
+CATEGORY | Test Questions 4
+MC_SINGLE | What is generic object foTranslation used for in SAP SuccessFactors Employee Central? | A. To translate XML and MDF FO field labels | B. To translate any generic object field labels in the instance | C. To translate MDF FO field labels | D. To translate XML FO field labels | C
+MC_SINGLE | How do you configure alert recipients? | A. Recipients are configured within the EC Alerts business rule. | B. Recipients are configured in Manage Data. | C. Recipients are configured as workflow contributors. | D. Recipients are configured as workflow approvers. | D
+MC_MULTI | Which pre-delivered objects are configured in the Corporate Data Model? Note: There are 3 correct answers to this question. (Select all that apply) | A. Event reason | B. Pay Calendar | C. Location | D. Cost center | E. Pay range | A,C,E
+MC_MULTI | What must be done to ensure that you can use a custom generic (MDF) object for Employee Self-Service? Note: There are 2 correct answers to this question. (Select all that apply) | A. Set the externalName field to Data Type = User. | B. Create a Valid When association for the object. | C. Create one configuration UI for the object. | D. Set the externalCode field to Data Type = User. | C,D
+MC_MULTI | Which fields are required when importing Personal Information? Note: There are 2 correct answers to this question. (Select all that apply) | A. Username | B. Event Date | C. User Id | D. Personal Id External | B,D
+CATEGORY | Test Questions 5
+MC_MULTI | In which business rule scenario do you use model base objects? Note: There are 2 correct answers to this question. (Select all that apply) | A. Trigger Workflows | B. Trigger Rules to Display Internal Job History | C. Trigger Rules for Hire/Rehire | D. Save Changes to Foundation Objects | A,C
+MC_SINGLE | In a generic object with a picklist field, what must be entered in the Valid Values Source? | A. Picklist Value ID | B. Picklist Code | C. Legacy Picklist ID | D. Picklist Value External Code | B
+MC_SINGLE | How is the event reason derived when a business rule is enabled for import? | A. The event reason is derived using the catch-all rule. | B. The event reason must be selected manually. | C. The event reason indicated in the import overrides the onSave ERD rule. | D. The onSave ERD rule overrides the event reason value indicated in the import file. | C
+MC_MULTI | Which destination objects do you select for the Valid When and Composite associations? Note: There are 2 correct answers to this question. (Select all that apply) | A. Composite association - Parent object | B. Valid When association - Higher level object | C. Valid When association - Lower level object | D. Composite association - Child object | B,D
+MC_SINGLE | What field of the country-specific Corporate Address element is required in the Corporate Data Model? | A. City | B. Location | C. Address1 | D. Country | D
+CATEGORY | Test Questions 6
+MC_MULTI | What tags are supported in alert messages? Note: There are 2 correct answers to this question. (Select all that apply) | A. [[SUBJECT_USER]] | B. [[EVENT_REASON]] | C. [[HRIS_ELEMENT]] | D. [[RECIPIENT_NAME]] | A,B
+MC_MULTI | What properties are available when using model base objects in business rules? Note: There are 3 correct answers to this question. (Select all that apply) | A. PII | B. Visibility | C. Previous Value | D. Max-length | E. Required | B,C,E
+MC_SINGLE | Fields in the termination screen are configured in which hris-element? | A. Personal Information | B. Employment Information | C. Compensation Information | D. Job Information | B
+MC_MULTI | According to SAP guidelines, what can you do in the event picklist when configuring events and event reasons? Note: There are 3 correct answers to this question. (Select all that apply) | A. Add a new language translation. | B. Change the status. | C. Change the external_code of an event. | D. Change the labels. | E. Add a new event. | A,B,D
+MC_SINGLE | Manager A initiated a job code change for Employee X with an effectivity date of January 15. Another manager initiated the same request, but for January 30. What happens to the workflows triggered by both transactions? | A. The system will reject both workflows. | B. The system will cancel the second workflow. | C. The system will cancel the first workflow. | D. The system will allow both workflows to continue. | D
+
