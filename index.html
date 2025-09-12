@@ -64,7 +64,71 @@
       }
 
       if (!payload.found) {
-        out.innerHTML = `<div class="card"><p>No user found for "${username}".</p></div>`;
+        out.innerHTML = `
+          <div class="card">
+            <p>No user found for "${username}".</p>
+            <div style="padding-top:8px"><button id="create-user-btn">Create User</button></div>
+          </div>`;
+        document.getElementById('create-user-btn').addEventListener('click', () => {
+          out.innerHTML = `
+            <div class="card">
+              <form id="create-user-form">
+                <div class="row"><div class="label">userId</div><div class="value"><input name="userId" type="text" value="${username}"></div></div>
+                <div class="row"><div class="label">username</div><div class="value"><input name="username" type="text" value="${username}"></div></div>
+                <div class="row"><div class="label">displayName</div><div class="value"><input name="displayName" type="text"></div></div>
+                <div class="row"><div class="label">email</div><div class="value"><input name="email" type="email"></div></div>
+                <div class="row"><div class="label">status</div><div class="value"><input name="status" type="text" placeholder="t"></div></div>
+                <div class="row"><div class="label">timeZone</div><div class="value"><input name="timeZone" type="text" placeholder="US/Eastern"></div></div>
+                <div class="row"><div class="label">defaultLocale</div><div class="value"><input name="defaultLocale" type="text" placeholder="en_US"></div></div>
+                <div class="row"><div class="label">division</div><div class="value"><input name="division" type="text"></div></div>
+                <div class="row"><div class="label">department</div><div class="value"><input name="department" type="text"></div></div>
+                <div class="row"><div class="label">location</div><div class="value"><input name="location" type="text"></div></div>
+                <div style="padding-top:12px; display:flex; gap:8px;">
+                  <button type="submit">Create</button>
+                  <button type="button" id="create-cancel">Cancel</button>
+                </div>
+              </form>
+              <div id="create-user-msg" class="muted" style="padding-top:8px;"></div>
+            </div>`;
+
+          document.getElementById('create-cancel').addEventListener('click', () => {
+            out.innerHTML = `<div class=\"card\"><p>No user found for \"${username}\".</p><div style=\"padding-top:8px\"><button id=\"create-user-btn\">Create User</button></div></div>`;
+          });
+
+          document.getElementById('create-user-form').addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const fd = new FormData(ev.currentTarget);
+            const payload = Object.fromEntries(fd.entries());
+            const msg = document.getElementById('create-user-msg');
+            msg.textContent = 'Creating…';
+            try {
+              const resp = await fetch('/api/user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const ctype = resp.headers.get('content-type') || '';
+              const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+              if (!resp.ok) {
+                msg.innerHTML = `Error: ${data.error || 'Create failed'}\n` + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details || data.raw || '', null, 2));
+                return;
+              }
+              // Re-query the user to render the normal view
+              const r3 = await fetch(`/api/user?username=${encodeURIComponent(username)}`);
+              const c3 = r3.headers.get('content-type') || '';
+              const p3 = c3.includes('application/json') ? await r3.json() : { raw: await r3.text() };
+              if (r3.ok && p3.found) {
+                // Simulate a fresh search render by updating the input and triggering submit
+                document.getElementById('u').value = username;
+                form.dispatchEvent(new Event('submit'));
+              } else {
+                msg.textContent = 'Created, but could not reload record automatically.';
+              }
+            } catch (e) {
+              msg.textContent = 'Unexpected error: ' + String(e);
+            }
+          });
+        });
         return;
       }
 
@@ -101,7 +165,62 @@
               <pre class="value">${typeof details === 'string' ? details : JSON.stringify(details, null, 2)}</pre>
             </div>`;
         } else if (!payload2.found) {
-          out.innerHTML += `<div class="card" style="margin-top:12px;"><p>No score record found.</p></div>`;
+          out.innerHTML += `
+            <div class="card" id="score-missing" style="margin-top:12px;">
+              <p>No score record found.</p>
+              <div class="muted" style="padding-bottom:8px;">externalCode typically must equal the user's userId.</div>
+              <div style="padding-top:8px"><button id="create-score-btn">Create Score</button></div>
+            </div>`;
+          document.getElementById('create-score-btn')?.addEventListener('click', () => {
+            const sc = document.getElementById('score-missing');
+            sc.innerHTML = `
+              <form id="score-create-form">
+                <div class="row"><div class="label">externalCode</div><div class="value"><input name="externalCode" type="text" value="${u.userId}"></div></div>
+                <div class="row"><div class="label">externalName</div><div class="value"><input name="externalName" type="text" value=""></div></div>
+                <div class="row"><div class="label">cust_Score</div><div class="value"><input name="cust_Score" type="text" value=""></div></div>
+                <div style="padding-top:12px; display:flex; gap:8px;">
+                  <button type="submit">Create</button>
+                  <button type="button" id="score-create-cancel">Cancel</button>
+                </div>
+              </form>
+              <div id="score-create-msg" class="muted" style="padding-top:8px;"></div>
+            `;
+            document.getElementById('score-create-cancel').addEventListener('click', () => {
+              sc.innerHTML = `<p>No score record found.</p><div style=\"padding-top:8px\"><button id=\"create-score-btn\">Create Score</button></div>`;
+            });
+            document.getElementById('score-create-form').addEventListener('submit', async (ev) => {
+              ev.preventDefault();
+              const fd = new FormData(ev.currentTarget);
+              const payload = Object.fromEntries(fd.entries());
+              const msg = document.getElementById('score-create-msg');
+              msg.textContent = 'Creating…';
+              try {
+                const resp = await fetch('/api/score', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+                });
+                const ctype = resp.headers.get('content-type') || '';
+                const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+                if (!resp.ok) {
+                  msg.innerHTML = `Error: ${data.error || 'Create failed'}\n` + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details || data.raw || '', null, 2));
+                  return;
+                }
+                // Re-fetch score to display
+                const r4 = await fetch(`/api/score?username=${encodeURIComponent(u.username)}`);
+                const c4 = r4.headers.get('content-type') || '';
+                const p4 = c4.includes('application/json') ? await r4.json() : { raw: await r4.text() };
+                if (r4.ok && p4.found) {
+                  // Trigger a fresh search to rebuild the view
+                  form.dispatchEvent(new Event('submit'));
+                } else {
+                  msg.textContent = 'Created, but could not reload score automatically.';
+                }
+              } catch (e) {
+                msg.textContent = 'Unexpected error: ' + String(e);
+              }
+            });
+          });
         } else {
           const s = payload2.score;
           out.innerHTML += `

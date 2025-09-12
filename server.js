@@ -114,11 +114,45 @@ app.get('/api/score', async (req, res) => {
   if (!username) return res.status(400).json({ error: 'username is required' });
 
   try {
-    const url = `${BASE_URL}/odata/v2/cust_Score`;
+    // Resolve the likely externalCode candidates: username and, if possible, userId
     const safeUsername = String(username).replace(/'/g, "''");
+    let candidates = [safeUsername];
+    try {
+      const uUrl = `${BASE_URL}/odata/v2/User`;
+      const uParams = {
+        $format: 'json',
+        $select: 'userId,username',
+        $filter: `username eq '${safeUsername}'`
+      };
+      if (process.env.COMPANY_ID) uParams.company = process.env.COMPANY_ID;
+      const uResp = await axios.get(uUrl, {
+        params: uParams,
+        headers: {
+          Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+          Accept: 'application/json',
+          ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+        },
+        validateStatus: () => true,
+        timeout: 10000
+      });
+      const uCType = String(uResp.headers['content-type'] || '');
+      if (uCType.includes('application/json') && uResp.status >= 200 && uResp.status < 300) {
+        const list = uResp.data?.d?.results ?? [];
+        if (list.length) {
+          const uid = String(list[0].userId || '').replace(/'/g, "''");
+          if (uid && !candidates.includes(uid)) candidates.unshift(uid);
+        }
+      }
+    } catch (_) {
+      // If lookup fails, continue with username only
+    }
+
+    // Build OR filter across candidates
+    const orFilter = candidates.map(v => `externalCode eq '${v}'`).join(' or ');
+    const url = `${BASE_URL}/odata/v2/cust_Score`;
     const params = {
       $format: 'json',
-      $filter: `externalCode eq '${safeUsername}'`,
+      $filter: candidates.length > 1 ? `(${orFilter})` : orFilter,
       $select: [
         'externalCode','cust_Score','externalName','mdfSystemRecordStatus',
         'createdBy','createdDateTime','lastModifiedBy','lastModifiedDateTime'
@@ -195,8 +229,73 @@ app.put('/api/score', async (req, res) => {
       return res.status(400).json({ error: 'no allowed fields in updates' });
     }
 
-    const safeCode = String(username).replace(/'/g, "''");
-    const updateUrl = `${BASE_URL}/odata/v2/cust_Score('${encodeURIComponent(safeCode)}')`;
+    // Resolve the actual externalCode by looking up existing score by either userId or username
+    let resolvedCode = null;
+    try {
+      const safeUsername = String(username).replace(/'/g, "''");
+      // Try to fetch userId from User entity
+      let candidates = [safeUsername];
+      const uUrl = `${BASE_URL}/odata/v2/User`;
+      const uParams = {
+        $format: 'json',
+        $select: 'userId,username',
+        $filter: `username eq '${safeUsername}'`
+      };
+      if (process.env.COMPANY_ID) uParams.company = process.env.COMPANY_ID;
+      const uResp = await axios.get(uUrl, {
+        params: uParams,
+        headers: {
+          Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+          Accept: 'application/json',
+          ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+        },
+        validateStatus: () => true,
+        timeout: 10000
+      });
+      const uCType = String(uResp.headers['content-type'] || '');
+      if (uCType.includes('application/json') && uResp.status >= 200 && uResp.status < 300) {
+        const list = uResp.data?.d?.results ?? [];
+        if (list.length) {
+          const uid = String(list[0].userId || '').replace(/'/g, "''");
+          if (uid && !candidates.includes(uid)) candidates.unshift(uid);
+        }
+      }
+
+      // Query score with OR of candidates to find the existing record's key
+      const orFilter = candidates.map(v => `externalCode eq '${v}'`).join(' or ');
+      const sUrl = `${BASE_URL}/odata/v2/cust_Score`;
+      const sParams = {
+        $format: 'json',
+        $select: 'externalCode',
+        $filter: candidates.length > 1 ? `(${orFilter})` : orFilter
+      };
+      if (process.env.COMPANY_ID) sParams.company = process.env.COMPANY_ID;
+      const sResp = await axios.get(sUrl, {
+        params: sParams,
+        headers: {
+          Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+          Accept: 'application/json',
+          ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+        },
+        validateStatus: () => true,
+        timeout: 10000
+      });
+      const sCType = String(sResp.headers['content-type'] || '');
+      if (sCType.includes('application/json') && sResp.status >= 200 && sResp.status < 300) {
+        const sList = sResp.data?.d?.results ?? [];
+        if (sList.length) {
+          resolvedCode = sList[0].externalCode;
+        }
+      }
+    } catch (_) {
+      // If resolution fails, we will attempt update with provided username (may fail gracefully)
+    }
+
+    if (!resolvedCode) {
+      return res.status(404).json({ error: 'score not found for username', details: 'No cust_Score record matched by username or userId' });
+    }
+
+    const updateUrl = `${BASE_URL}/odata/v2/cust_Score('${encodeURIComponent(String(resolvedCode))}')`;
     const params = {};
     if (process.env.COMPANY_ID) params.company = process.env.COMPANY_ID;
 
@@ -208,6 +307,7 @@ app.put('/api/score', async (req, res) => {
         'Content-Type': 'application/json',
         'X-HTTP-Method': 'MERGE',
         'If-Match': '*',
+        ...(Object.prototype.hasOwnProperty.call(body, 'externalName') ? { 'Accept-Language': process.env.DEFAULT_LOCALE || 'en-US' } : {}),
         ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
       },
       validateStatus: () => true,
@@ -220,9 +320,160 @@ app.put('/api/score', async (req, res) => {
       return res.status(resp.status).json({ error: 'update failed', status: resp.status, details });
     }
 
-    return res.json({ ok: true, externalCode: username, updated: Object.keys(body) });
+    return res.json({ ok: true, externalCode: resolvedCode, updated: Object.keys(body) });
   } catch (err) {
     return res.status(500).json({ error: 'Failed to update cust_Score', details: err?.message || String(err) });
+  }
+});
+
+// Create a new cust_Score record
+app.post('/api/score', async (req, res) => {
+  try {
+    const { username, externalCode, externalName, cust_Score } = req.body || {};
+    const inputCode = externalCode || username;
+    if (!inputCode) return res.status(400).json({ error: 'externalCode or username is required' });
+
+    // Validate and resolve externalCode against User (many MDFs reference User)
+    let codeToUse = inputCode;
+    let resolvedUser = null;
+    try {
+      const safeCode = String(inputCode).replace(/'/g, "''");
+      const checkUrl = `${BASE_URL}/odata/v2/User`;
+      const checkParams = {
+        $format: 'json',
+        $select: 'userId,username',
+        $filter: `(userId eq '${safeCode}' or username eq '${safeCode}')`
+      };
+      if (process.env.COMPANY_ID) checkParams.company = process.env.COMPANY_ID;
+      const checkResp = await axios.get(checkUrl, {
+        params: checkParams,
+        headers: {
+          Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+          Accept: 'application/json',
+          ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+        },
+        validateStatus: () => true,
+        timeout: 15000
+      });
+
+      const checkCType = String(checkResp.headers['content-type'] || '');
+      if (!checkCType.includes('application/json')) {
+        return res.status(checkResp.status || 502).json({
+          error: 'SuccessFactors returned non-JSON during user validation',
+          status: checkResp.status,
+          contentType: checkCType,
+          bodyPreview: typeof checkResp.data === 'string' ? checkResp.data.slice(0, 500) : '[non-string]'
+        });
+      }
+      const uResults = checkResp.data?.d?.results ?? [];
+      if (!uResults.length) {
+        return res.status(400).json({
+          error: 'Invalid externalCode',
+          details: 'No matching User found for externalCode. Ensure it equals an existing userId or username.'
+        });
+      }
+      resolvedUser = uResults[0];
+      const src = (process.env.SCORE_EXTERNAL_CODE_SOURCE || 'userId').toLowerCase();
+      codeToUse = src === 'username' ? (resolvedUser.username ?? inputCode) : (resolvedUser.userId ?? inputCode);
+    } catch (preErr) {
+      // If validation call fails due to SF issues, continue to let create fail with SF message
+    }
+
+    const body = {
+      externalCode: codeToUse,
+      ...(externalName != null ? { externalName } : {}),
+      ...(cust_Score != null ? { cust_Score } : {})
+    };
+    const url = `${BASE_URL}/odata/v2/cust_Score`;
+    const params = {};
+    if (process.env.COMPANY_ID) params.company = process.env.COMPANY_ID;
+
+    const resp = await axios.post(url, body, {
+      params,
+      headers: {
+        Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        // For localized fields like externalName, indicate the language variant being written
+        ...(externalName ? { 'Accept-Language': process.env.DEFAULT_LOCALE || 'en-US' } : {}),
+        ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+      },
+      validateStatus: () => true,
+      timeout: 30000
+    });
+
+    const ctype = String(resp.headers['content-type'] || '');
+    if (!ctype.includes('application/json')) {
+      return res.status(resp.status || 502).json({
+        error: 'SuccessFactors returned non-JSON during create',
+        status: resp.status,
+        contentType: ctype,
+        bodyPreview: typeof resp.data === 'string' ? resp.data.slice(0, 800) : '[non-string]'
+      });
+    }
+    if (resp.status < 200 || resp.status >= 300) {
+      return res.status(resp.status).json({ error: 'create failed', status: resp.status, details: resp.data });
+    }
+
+    // Success: SF often returns the created entity in d
+    return res.json({ ok: true, created: resp.data?.d ?? null });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to create cust_Score', details: err?.message || String(err) });
+  }
+});
+
+// Create a new User record
+app.post('/api/user', async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const username = payload.username;
+    const userId = payload.userId ?? username;
+    if (!username || !userId) return res.status(400).json({ error: 'username and userId are required' });
+
+    const allowed = new Set([
+      'userId','username','displayName','defaultFullName','email','status',
+      'division','department','location','timeZone','defaultLocale'
+    ]);
+    const body = {};
+    for (const [k, v] of Object.entries(payload)) {
+      if (allowed.has(k) && v != null) body[k] = v;
+    }
+    // Ensure required identifiers are included
+    body.userId = userId;
+    body.username = username;
+
+    const url = `${BASE_URL}/odata/v2/User`;
+    const params = {};
+    if (process.env.COMPANY_ID) params.company = process.env.COMPANY_ID;
+
+    const resp = await axios.post(url, body, {
+      params,
+      headers: {
+        Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+      },
+      validateStatus: () => true,
+      timeout: 30000
+    });
+
+    const ctype = String(resp.headers['content-type'] || '');
+    if (!ctype.includes('application/json')) {
+      return res.status(resp.status || 502).json({
+        error: 'SuccessFactors returned non-JSON during create',
+        status: resp.status,
+        contentType: ctype,
+        bodyPreview: typeof resp.data === 'string' ? resp.data.slice(0, 800) : '[non-string]'
+      });
+    }
+    if (resp.status < 200 || resp.status >= 300) {
+      return res.status(resp.status).json({ error: 'create failed', status: resp.status, details: resp.data });
+    }
+
+    return res.json({ ok: true, created: resp.data?.d ?? null });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to create user', details: err?.message || String(err) });
   }
 });
 
