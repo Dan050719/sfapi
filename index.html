@@ -88,6 +88,105 @@
           <div style="padding-top:12px"><button id="edit-btn">Edit</button></div>
         </div>`;
 
+      // Fetch and render custom score below the user card
+      try {
+        const r2 = await fetch(`/api/score?username=${encodeURIComponent(u.username)}`);
+        const ctype2 = r2.headers.get('content-type') || '';
+        const payload2 = ctype2.includes('application/json') ? await r2.json() : { raw: await r2.text() };
+        if (!r2.ok) {
+          const details = payload2?.details ?? payload2?.raw ?? '';
+          out.innerHTML += `
+            <div class="card" style="margin-top:12px;">
+              <p>Error reading score</p>
+              <pre class="value">${typeof details === 'string' ? details : JSON.stringify(details, null, 2)}</pre>
+            </div>`;
+        } else if (!payload2.found) {
+          out.innerHTML += `<div class="card" style="margin-top:12px;"><p>No score record found.</p></div>`;
+        } else {
+          const s = payload2.score;
+          out.innerHTML += `
+            <div class="card" id="score-card" style="margin-top:12px;">
+              ${row('score.externalCode', s.externalCode)}
+              ${row('score.externalName', s.externalName)}
+              ${row('score.cust_Score', s.score)}
+              ${row('score.mdfSystemRecordStatus', s.mdfSystemRecordStatus)}
+              ${row('score.createdBy', s.createdBy)}
+              ${row('score.createdDateTime', s.createdDateTime)}
+              ${row('score.lastModifiedBy', s.lastModifiedBy)}
+              ${row('score.lastModifiedDateTime', s.lastModifiedDateTime)}
+              <div style="padding-top:12px"><button id="score-edit-btn">Edit Score</button></div>
+            </div>`;
+
+          const score = s;
+          document.getElementById('score-edit-btn')?.addEventListener('click', () => {
+            const card = document.getElementById('score-card');
+            card.innerHTML = `
+              <form id="score-edit-form">
+                <div class="row"><div class="label">externalName</div><div class="value"><input name="externalName" type="text" value="${score.externalName ?? ''}"></div></div>
+                <div class="row"><div class="label">cust_Score</div><div class="value"><input name="cust_Score" type="text" value="${score.score ?? ''}"></div></div>
+                <div class="row"><div class="label">mdfSystemRecordStatus</div><div class="value"><input name="mdfSystemRecordStatus" type="text" value="${score.mdfSystemRecordStatus ?? ''}"></div></div>
+                <div style="padding-top:12px; display:flex; gap:8px;">
+                  <button type="submit">Save</button>
+                  <button type="button" id="score-cancel-btn">Cancel</button>
+                </div>
+              </form>
+              <div id="score-msg" class="muted" style="padding-top:8px;"></div>
+            `;
+
+            document.getElementById('score-cancel-btn').addEventListener('click', () => {
+              const s = score;
+              card.innerHTML = `
+                ${row('score.externalCode', s.externalCode)}
+                ${row('score.externalName', s.externalName)}
+                ${row('score.cust_Score', s.score)}
+                ${row('score.mdfSystemRecordStatus', s.mdfSystemRecordStatus)}
+                ${row('score.createdBy', s.createdBy)}
+                ${row('score.createdDateTime', s.createdDateTime)}
+                ${row('score.lastModifiedBy', s.lastModifiedBy)}
+                ${row('score.lastModifiedDateTime', s.lastModifiedDateTime)}
+                <div style=\"padding-top:12px\"><button id=\"score-edit-btn\">Edit Score</button></div>
+              `;
+            });
+
+            document.getElementById('score-edit-form').addEventListener('submit', async (ev) => {
+              ev.preventDefault();
+              const fd = new FormData(ev.currentTarget);
+              const updates = {};
+              ['externalName','cust_Score','mdfSystemRecordStatus'].forEach(k => {
+                const val = fd.get(k);
+                const current = k === 'cust_Score' ? score.score : score[k];
+                if (val !== null && val !== current) updates[k] = val;
+              });
+              const msg = document.getElementById('score-msg');
+              if (Object.keys(updates).length === 0) {
+                msg.textContent = 'No changes to save.';
+                return;
+              }
+              msg.textContent = 'Saving…';
+              try {
+                const resp = await fetch('/api/score', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ username: u.username, updates })
+                });
+                const ctype = resp.headers.get('content-type') || '';
+                const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+                if (!resp.ok) {
+                  msg.innerHTML = `Error: ${data.error || 'Update failed'}\n` + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details || data.raw || '', null, 2));
+                  return;
+                }
+                Object.assign(score, updates);
+                msg.textContent = 'Saved.';
+              } catch (e) {
+                msg.textContent = 'Unexpected error: ' + String(e);
+              }
+            });
+          });
+        }
+      } catch (e2) {
+        out.innerHTML += `<div class="card" style="margin-top:12px;"><p>Unexpected error loading score.</p><pre class="value">${String(e2)}</pre></div>`;
+      }
+
       document.getElementById('edit-btn').addEventListener('click', () => {
         const u = lastUser;
         const card = document.getElementById('user-card');

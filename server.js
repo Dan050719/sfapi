@@ -108,6 +108,124 @@ app.get('/api/user', async (req, res) => {
   }
 });
 
+// Retrieve custom object cust_Score by username (externalCode)
+app.get('/api/score', async (req, res) => {
+  const { username } = req.query;
+  if (!username) return res.status(400).json({ error: 'username is required' });
+
+  try {
+    const url = `${BASE_URL}/odata/v2/cust_Score`;
+    const safeUsername = String(username).replace(/'/g, "''");
+    const params = {
+      $format: 'json',
+      $filter: `externalCode eq '${safeUsername}'`,
+      $select: [
+        'externalCode','cust_Score','externalName','mdfSystemRecordStatus',
+        'createdBy','createdDateTime','lastModifiedBy','lastModifiedDateTime'
+      ].join(',')
+    };
+    if (process.env.COMPANY_ID) params.company = process.env.COMPANY_ID;
+
+    const resp = await axios.get(url, {
+      params,
+      headers: {
+        Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+        Accept: 'application/json',
+        ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+      },
+      validateStatus: () => true,
+      timeout: 15000
+    });
+
+    const ctype = String(resp.headers['content-type'] || '');
+    if (!ctype.includes('application/json')) {
+      return res.status(resp.status || 502).json({
+        error: 'SuccessFactors returned non-JSON',
+        status: resp.status,
+        contentType: ctype,
+        bodyPreview: typeof resp.data === 'string' ? resp.data.slice(0, 500) : '[non-string]'
+      });
+    }
+
+    if (resp.status < 200 || resp.status >= 300) {
+      return res.status(resp.status).json({
+        error: 'SuccessFactors error',
+        status: resp.status,
+        details: resp.data
+      });
+    }
+
+    const results = resp.data?.d?.results ?? [];
+    if (!results.length) return res.json({ found: false, score: null });
+
+    const s = results[0];
+    const score = {
+      externalCode: s.externalCode,
+      score: s.cust_Score,
+      externalName: s.externalName,
+      mdfSystemRecordStatus: s.mdfSystemRecordStatus,
+      createdBy: s.createdBy,
+      createdDateTime: s.createdDateTime,
+      lastModifiedBy: s.lastModifiedBy,
+      lastModifiedDateTime: s.lastModifiedDateTime
+    };
+    return res.json({ found: true, score });
+  } catch (err) {
+    return res.status(500).json({
+      error: 'Failed to query SuccessFactors (cust_Score)',
+      details: err?.message || String(err)
+    });
+  }
+});
+
+// Update fields on custom object cust_Score by username (externalCode)
+app.put('/api/score', async (req, res) => {
+  try {
+    const { username, updates } = req.body || {};
+    if (!username) return res.status(400).json({ error: 'username is required' });
+    if (!updates || typeof updates !== 'object') return res.status(400).json({ error: 'updates object is required' });
+
+    // Allow-list fields for safety
+    const allowed = new Set(['cust_Score', 'externalName', 'mdfSystemRecordStatus']);
+    const body = {};
+    for (const [k, v] of Object.entries(updates)) {
+      if (allowed.has(k)) body[k] = v;
+    }
+    if (Object.keys(body).length === 0) {
+      return res.status(400).json({ error: 'no allowed fields in updates' });
+    }
+
+    const safeCode = String(username).replace(/'/g, "''");
+    const updateUrl = `${BASE_URL}/odata/v2/cust_Score('${encodeURIComponent(safeCode)}')`;
+    const params = {};
+    if (process.env.COMPANY_ID) params.company = process.env.COMPANY_ID;
+
+    const resp = await axios.post(updateUrl, body, {
+      params,
+      headers: {
+        Authorization: `Bearer ${SF_BEARER_TOKEN}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'X-HTTP-Method': 'MERGE',
+        'If-Match': '*',
+        ...(process.env.COMPANY_ID ? { 'Company-Id': process.env.COMPANY_ID } : {})
+      },
+      validateStatus: () => true,
+      timeout: 30000
+    });
+
+    const ctype = String(resp.headers['content-type'] || '');
+    if (resp.status < 200 || resp.status >= 300) {
+      const details = ctype.includes('application/json') ? resp.data : { raw: typeof resp.data === 'string' ? resp.data.slice(0, 800) : '[non-string]' };
+      return res.status(resp.status).json({ error: 'update failed', status: resp.status, details });
+    }
+
+    return res.json({ ok: true, externalCode: username, updated: Object.keys(body) });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to update cust_Score', details: err?.message || String(err) });
+  }
+});
+
 // Update selected user fields by username
 app.put('/api/user', async (req, res) => {
   try {
