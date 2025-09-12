@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SuccessFactors User Lookup</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; }
+    form { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+    input[type="text"] { padding: 8px; min-width: 280px; }
+    button { padding: 8px 12px; cursor: pointer; }
+    .card { border: 1px solid #ddd; border-radius: 8px; padding: 16px; max-width: 700px; }
+    .row { display: grid; grid-template-columns: 180px 1fr; gap: 8px; padding: 6px 0; }
+    .row:nth-child(odd) { background: #fafafa; }
+    .label { color: #555; }
+    .value { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .muted { color: #777; }
+  </style>
+</head>
+<body>
+  <h1>SuccessFactors User Lookup</h1>
+
+  <form id="lookup-form">
+    <label for="u">Username</label>
+    <input id="u" name="u" type="text" placeholder="e.g., dshields_svc" required />
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="out"></div>
+
+  <script>
+  const form = document.getElementById('lookup-form');
+  const out = document.getElementById('out');
+
+  function row(label, value) {
+    return `
+      <div class="row">
+        <div class="label">${label}</div>
+        <div class="value">${value ?? '<span class="muted">—</span>'}</div>
+      </div>
+    `;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = new FormData(form).get('u').trim();
+    if (!username) return;
+
+    out.innerHTML = '<p class="muted">Loading…</p>';
+    try {
+      const r = await fetch(`/api/user?username=${encodeURIComponent(username)}`);
+      const ctype = r.headers.get('content-type') || '';
+      const payload = ctype.includes('application/json') ? await r.json() : { raw: await r.text() };
+
+      if (!r.ok) {
+        const details = payload?.details ?? payload?.raw ?? '';
+        out.innerHTML = `
+          <div class="card">
+            <p>Error: ${payload?.error || 'Request failed'}</p>
+            <pre class="value">${typeof details === 'string' ? details : JSON.stringify(details, null, 2)}</pre>
+          </div>`;
+        return;
+      }
+
+      if (!payload.found) {
+        out.innerHTML = `<div class="card"><p>No user found for "${username}".</p></div>`;
+        return;
+      }
+
+      const u = payload.user;
+      out.innerHTML = `
+        <div class="card">
+          ${row('userId', u.userId)}
+          ${row('username', u.username)}
+          ${row('displayName', u.displayName)}
+          ${row('email', u.email)}
+          ${row('status', u.status)}
+          ${row('division', u.division)}
+          ${row('department', u.department)}
+          ${row('location', u.location)}
+          ${row('timeZone', u.timeZone)}
+          ${row('defaultLocale', u.defaultLocale)}
+          ${row('assignmentUUID', u.assignmentUUID)}
+          ${row('lastModifiedDateTime', u.lastModifiedDateTime)}
+          ${row('lastModifiedWithTZ', u.lastModifiedWithTZ)}
+        </div>`;
+    } catch (err) {
+      out.innerHTML = `<div class="card"><p>Unexpected error.</p><pre class="value">${String(err)}</pre></div>`;
+    }
+  });
+  </script>
+</body>
+</html>
