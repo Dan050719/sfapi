@@ -89,6 +89,28 @@
             border: 1px solid gold;
             border-radius: 5px;
         }
+        .player-metrics {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+            justify-content: center;
+        }
+        .metric-box {
+            min-width: 110px;
+            background: #000066;
+            border: 1px solid gold;
+            border-radius: 4px;
+            padding: 4px 6px;
+            color: gold;
+        }
+        .metric-label {
+            font-size: 10px;
+            color: #ffec8b;
+        }
+        .metric-value {
+            font-size: 14px;
+            color: #fff;
+        }
         .player-score.control {
             background-color: yellow;
             color: navy;

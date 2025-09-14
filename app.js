@@ -96,6 +96,7 @@
                 }
             });
         }
+        // Populate players form; if SF profile is present in query, use it for player 1
         function generateForms() {
             playerForms.innerHTML = '';
             const num = parseInt(numPlayersSelect.value);
@@ -105,6 +106,14 @@
                 formDiv.innerHTML = '<label>Name:</label><input type="text" id="player-name-' + i + '" value="Player ' + (i + 1) + '"><label>Is AI?</label><input type="checkbox" id="is-ai-' + i + '">';
                 playerForms.appendChild(formDiv);
             }
+            try {
+                if (window.sfProfile && window.sfProfile.user) {
+                    const u = window.sfProfile.user;
+                    const display = u.displayName || u.username || u.userId || 'Player 1';
+                    const inp = document.getElementById('player-name-0');
+                    if (inp) inp.value = display;
+                }
+            } catch (_) {}
             speakHostDialogue("Forms are ready! Enter each player's name and indicate if they are an AI contestant. When complete, click 'Start Game' to proceed to the board.");
         }
         function setupPlayers() {
@@ -113,7 +122,30 @@
             for (let i = 0; i < num; i++) {
                 const name = document.getElementById('player-name-' + i).value;
                 const isAI = document.getElementById('is-ai-' + i).checked;
-                players.push({ name: name, isAI: isAI, score: 0, streak: 0, bestStreak: 0 });
+                const p = { name: name, isAI: isAI, score: 0, maxScore: 0, streak: 0, bestStreak: 0 };
+                // Attach SF profile to the first human player, if available
+                if (i === 0 && !isAI && window.sfProfile && window.sfProfile.user) {
+                    p.sfUser = window.sfProfile.user;
+                    if (window.sfProfile.score) {
+                        p.sfScore = window.sfProfile.score;
+                        // Initialize Highest Score / Highest Streak from SF record
+                        const sRec = window.sfProfile.score || {};
+                        const toNum = (v) => {
+                            const n = Number(String(v ?? '').replace(/,/g, ''));
+                            return Number.isFinite(n) ? n : 0;
+                        };
+                        const initScore = toNum(sRec.score);
+                        const initStreak = toNum(sRec.streak);
+                        if (!Number.isNaN(initScore) && Number.isFinite(initScore)) {
+                            p.maxScore = Math.max(0, Math.floor(initScore));
+                        }
+                        if (!Number.isNaN(initStreak) && Number.isFinite(initStreak)) {
+                            p.bestStreak = Math.max(0, Math.floor(initStreak));
+                            p.sfSyncedBestStreak = p.bestStreak; // baseline used for syncing
+                        }
+                    }
+                }
+                players.push(p);
             }
             playerSetup.style.display = 'none';
             boardSection.style.display = 'block';
@@ -133,6 +165,70 @@
             }
             speakHostDialogue(players[0].name + ', you have control. Select a clue from one of our ' + categories.length + ' categories to begin.');
         }
+        // Read ?userid or ?username from URL, fetch SF user + score, and expose to game as window.sfProfile
+        (async function initSFProfileFromQuery() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const userId = (params.get('userid') || params.get('userId') || '').trim();
+                const username = (params.get('username') || params.get('user') || '').trim();
+                const key = userId || username;
+                if (!key) return;
+                const q = userId ? `userid=${encodeURIComponent(userId)}` : `username=${encodeURIComponent(username)}`;
+                // Fetch base user
+                const r1 = await fetch(`/api/user?${q}`);
+                const ct1 = r1.headers.get('content-type') || '';
+                const p1 = ct1.includes('application/json') ? await r1.json() : { raw: await r1.text() };
+                if (!r1.ok || !p1.found) {
+                    console.warn('SF user lookup failed', p1);
+                    return;
+                }
+                const u = p1.user || null;
+                // Fetch score (will resolve userId/username internally)
+                const r2 = await fetch(`/api/score?username=${encodeURIComponent(u.username || username || userId)}`);
+                const ct2 = r2.headers.get('content-type') || '';
+                const p2 = ct2.includes('application/json') ? await r2.json() : { raw: await r2.text() };
+                let s = r2.ok && p2.found ? p2.score : null;
+                // If no score record exists, create one with zeros, then load into profile
+                if (!s) {
+                    try {
+                        const createResp = await fetch('/api/score', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: u.username || username || userId,
+                                externalName: (u.username || u.userId || ''),
+                                cust_Score: 0,
+                                cust_Streak: 0
+                            })
+                        });
+                        const ctypeC = createResp.headers.get('content-type') || '';
+                        const dataC = ctypeC.includes('application/json') ? await createResp.json() : { raw: await createResp.text() };
+                        if (createResp.ok) {
+                            // After create, set local default score object
+                            s = { externalCode: u.userId || u.username, score: 0, streak: 0, externalName: (u.username || u.userId || '') };
+                        } else {
+                            console.warn('Failed to create initial score record', dataC);
+                        }
+                    } catch (e) {
+                        console.warn('Error creating initial score record', e);
+                    }
+                }
+                window.sfProfile = { user: u, score: s };
+                console.log('Loaded SF profile:', window.sfProfile);
+                // If forms already present, prefill player 1 name
+                const inp = document.getElementById('player-name-0');
+                if (inp && u) {
+                    inp.value = u.displayName || u.username || u.userId || inp.value;
+                }
+                // Auto-set to 1 player and auto-generate forms when a user is present
+                if (typeof generateForms === 'function' && numPlayersSelect) {
+                    try { numPlayersSelect.value = '1'; } catch (_) {}
+                    try { generateForms(); } catch (_) {}
+                }
+            } catch (e) {
+                console.warn('Unable to initialize SF profile:', e);
+            }
+        })();
         function pollGamepads() {
             requestAnimationFrame(pollGamepads);
             if (!('getGamepads' in navigator)) return;
@@ -165,10 +261,17 @@
         function buildPlayerScores() {
             playerScoresDiv.innerHTML = '';
             players.forEach(function(p, i) {
+                if (typeof p.maxScore !== 'number') p.maxScore = 0;
+                p.maxScore = Math.max(p.maxScore, p.score);
                 const div = document.createElement('div');
                 div.classList.add('player-score');
                 div.dataset.index = i;
-                div.innerHTML = '<span>' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small>';
+                div.innerHTML =
+                    '<div class="player-line"><span class="player-name">' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small></div>' +
+                    '<div class="player-metrics">' +
+                    '  <div class="metric-box"><div class="metric-label">Highest Score</div><div class="metric-value" data-kind="maxScore">$' + (p.maxScore || 0) + '</div></div>' +
+                    '  <div class="metric-box"><div class="metric-label">Highest Streak</div><div class="metric-value" data-kind="bestStreak">' + (p.bestStreak || 0) + '</div></div>' +
+                    '</div>';
                 playerScoresDiv.appendChild(div);
             });
             updateControlHighlight();
@@ -177,7 +280,14 @@
             document.querySelectorAll('.player-score').forEach(function(d) {
                 const i = parseInt(d.dataset.index);
                 const p = players[i];
-                d.innerHTML = '<span>' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small>';
+                if (typeof p.maxScore !== 'number') p.maxScore = 0;
+                p.maxScore = Math.max(p.maxScore, p.score);
+                const nameEl = d.querySelector('.player-line');
+                if (nameEl) nameEl.innerHTML = '<span class="player-name">' + p.name + ': $' + p.score + '</span> <small>Streak: ' + p.streak + '</small>';
+                const maxScoreEl = d.querySelector('.metric-value[data-kind="maxScore"]');
+                if (maxScoreEl) maxScoreEl.textContent = '$' + (p.maxScore || 0);
+                const bestStreakEl = d.querySelector('.metric-value[data-kind="bestStreak"]');
+                if (bestStreakEl) bestStreakEl.textContent = String(p.bestStreak || 0);
             });
         }
         function updateControlHighlight() {
@@ -249,11 +359,42 @@
             if (n >= 2) return 'Two in a row!';
             return '';
         }
+        async function maybeSyncStreakToSF(player) {
+            try {
+                if (!player || !player.sfUser) return;
+                const username = player.sfUser.username || player.sfUser.userId;
+                if (!username) return;
+                const current = typeof player.bestStreak === 'number' ? player.bestStreak : 0;
+                const baseline = typeof player.sfSyncedBestStreak === 'number'
+                    ? player.sfSyncedBestStreak
+                    : (player.sfScore && !Number.isNaN(Number(player.sfScore.streak)) ? Number(player.sfScore.streak) : 0);
+                if (current <= baseline) return;
+                if (player._streakSyncInFlight) return;
+                player._streakSyncInFlight = true;
+                const resp = await fetch('/api/score', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, updates: { cust_Streak: current } })
+                });
+                const ctype = resp.headers.get('content-type') || '';
+                const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+                if (resp.ok) {
+                    player.sfSyncedBestStreak = current;
+                } else {
+                    console.warn('Failed to sync streak to SF', data);
+                }
+                player._streakSyncInFlight = false;
+            } catch (e) {
+                console.warn('Error syncing streak to SF', e);
+                player._streakSyncInFlight = false;
+            }
+        }
         function updateStreak(isCorrect, player) {
             let streakMsg = '';
             if (isCorrect) {
                 player.streak++;
                 if (player.streak > player.bestStreak) player.bestStreak = player.streak;
+                if (player.sfUser) { maybeSyncStreakToSF(player); }
                 streakMsg = streakMessage(player.streak);
                 if (streakMsg) {
                     speakHostDialogue(player.name + ' is ' + streakMsg + ' with ' + player.streak + ' correct answers in a row!');
@@ -850,9 +991,41 @@
             questionSection.style.display = 'none';
             boardSection.style.display = 'block';
             buildBoard();
-            if (results.length === totalClues) {
+            // Consider the game finished when all clues are marked answered,
+            // not just when results.length matches, since some paths (e.g.,
+            // edge cases, daily doubles) may mark answered without pushing results.
+            const anyRemaining = categories.some(function(cat) {
+                return cat.clues.some(function(c) { return !c.answered; });
+            });
+            if (!anyRemaining) {
                 speakHostDialogue("That's the end of the game! Let's review the final scores and see how our contestants performed.");
                 showResults();
+            }
+        }
+        async function syncFinalScoreToSF() {
+            try {
+                const p = players.find(function(px) { return px && px.sfUser; });
+                if (!p) return;
+                const username = p.sfUser.username || p.sfUser.userId;
+                if (!username) return;
+                // Treat the end-of-game displayed score as the player's "highest score"
+                // so the UI and stored value match.
+                const finalScore = Math.max(0, Math.floor(Number(p.score) || 0));
+                if (p._finalScoreSynced === finalScore) return;
+                const resp = await fetch('/api/score', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, updates: { cust_Score: finalScore } })
+                });
+                const ctype = resp.headers.get('content-type') || '';
+                const data = ctype.includes('application/json') ? await resp.json() : { raw: await resp.text() };
+                if (!resp.ok) {
+                    console.warn('Failed to sync final score to SF', data);
+                } else {
+                    p._finalScoreSynced = finalScore;
+                }
+            } catch (e) {
+                console.warn('Error syncing final score to SF', e);
             }
         }
         function showResults() {
@@ -906,8 +1079,13 @@
                 playerSection.appendChild(incorrectSection);
                 reportDiv.appendChild(playerSection);
             });
+            // At the end of the game, align the displayed Highest Score with final score
+            players.forEach(function(p) { p.maxScore = Math.max(0, Math.floor(Number(p.score) || 0)); });
+            updatePlayerScores();
             const standings = players.map(function(p) { return p.name + ': $' + p.score; }).join(', ');
             const winner = players.reduce(function(a, b) { return a.score > b.score ? a : b; });
+            // Push final score to SF for the SF-linked player
+            syncFinalScoreToSF();
             speakHostDialogue('Here are the final standings: ' + standings + '. Congratulations to our top scorer, ' + winner.name + '! Download your results or restart for another round!');
         }
         function downloadResults() {

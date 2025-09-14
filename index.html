@@ -185,6 +185,7 @@
                 <div class="row"><div class="label">externalCode</div><div class="value"><input name="externalCode" type="text" value="${u.userId}"></div></div>
                 <div class="row"><div class="label">externalName</div><div class="value"><input name="externalName" type="text" value=""></div></div>
                 <div class="row"><div class="label">cust_Score</div><div class="value"><input name="cust_Score" type="text" value=""></div></div>
+                <div class="row"><div class="label">cust_Streak</div><div class="value"><input name="cust_Streak" type="number" min="0" step="1" value=""></div></div>
                 <div style="padding-top:12px; display:flex; gap:8px;">
                   <button type="submit">Create</button>
                   <button type="button" id="score-create-cancel">Cancel</button>
@@ -235,6 +236,7 @@
               ${row('score.externalCode', s.externalCode)}
               ${row('score.externalName', s.externalName)}
               ${row('score.cust_Score', s.score)}
+              ${row('score.cust_Streak', s.streak)}
               ${row('score.mdfSystemRecordStatus', s.mdfSystemRecordStatus)}
               ${row('score.createdBy', s.createdBy)}
               ${row('score.createdDateTime', s.createdDateTime)}
@@ -250,6 +252,7 @@
               <form id="score-edit-form">
                 <div class="row"><div class="label">externalName</div><div class="value"><input name="externalName" type="text" value="${score.externalName ?? ''}"></div></div>
                 <div class="row"><div class="label">cust_Score</div><div class="value"><input name="cust_Score" type="text" value="${score.score ?? ''}"></div></div>
+                <div class="row"><div class="label">cust_Streak</div><div class="value"><input name="cust_Streak" type="number" min="0" step="1" value="${score.streak ?? ''}"></div></div>
                 <div class="row"><div class="label">mdfSystemRecordStatus</div><div class="value"><input name="mdfSystemRecordStatus" type="text" value="${score.mdfSystemRecordStatus ?? ''}"></div></div>
                 <div style="padding-top:12px; display:flex; gap:8px;">
                   <button type="submit">Save</button>
@@ -265,6 +268,7 @@
                 ${row('score.externalCode', s.externalCode)}
                 ${row('score.externalName', s.externalName)}
                 ${row('score.cust_Score', s.score)}
+                ${row('score.cust_Streak', s.streak)}
                 ${row('score.mdfSystemRecordStatus', s.mdfSystemRecordStatus)}
                 ${row('score.createdBy', s.createdBy)}
                 ${row('score.createdDateTime', s.createdDateTime)}
@@ -278,9 +282,9 @@
               ev.preventDefault();
               const fd = new FormData(ev.currentTarget);
               const updates = {};
-              ['externalName','cust_Score','mdfSystemRecordStatus'].forEach(k => {
+              ['externalName','cust_Score','cust_Streak','mdfSystemRecordStatus'].forEach(k => {
                 const val = fd.get(k);
-                const current = k === 'cust_Score' ? score.score : score[k];
+                const current = k === 'cust_Score' ? score.score : (k === 'cust_Streak' ? score.streak : score[k]);
                 if (val !== null && val !== current) updates[k] = val;
               });
               const msg = document.getElementById('score-msg');
@@ -301,7 +305,10 @@
                   msg.innerHTML = `Error: ${data.error || 'Update failed'}\n` + (typeof data.details === 'string' ? data.details : JSON.stringify(data.details || data.raw || '', null, 2));
                   return;
                 }
-                Object.assign(score, updates);
+                // Normalize local cache to keep UI in sync
+                if (Object.prototype.hasOwnProperty.call(updates, 'cust_Score')) score.score = updates.cust_Score;
+                if (Object.prototype.hasOwnProperty.call(updates, 'cust_Streak')) score.streak = updates.cust_Streak;
+                if (Object.prototype.hasOwnProperty.call(updates, 'externalName')) score.externalName = updates.externalName;
                 msg.textContent = 'Saved.';
               } catch (e) {
                 msg.textContent = 'Unexpected error: ' + String(e);

@@ -36,15 +36,17 @@ if (!SF_BEARER_TOKEN) {
  * Select only fields you care about to keep payload lean.
  */
 app.get('/api/user', async (req, res) => {
-  const { username } = req.query;
-  if (!username) return res.status(400).json({ error: 'username is required' });
+  const username = req.query.username || req.query.user || undefined;
+  const userIdParam = req.query.userid || req.query.userId || undefined;
+  if (!username && !userIdParam) return res.status(400).json({ error: 'username or userid is required' });
 
   try {
     const url = `${BASE_URL}/odata/v2/User`;
-    const safeUsername = String(username).replace(/'/g, "''");
+    const safeUser = String(userIdParam || username).replace(/'/g, "''");
+    const isById = Boolean(userIdParam);
     const params = {
       $format: 'json',
-      $filter: `username eq '${safeUsername}'`,
+      $filter: isById ? `userId eq '${safeUser}'` : `username eq '${safeUser}'`,
       $select: [
         'userId','username','displayName','defaultFullName','email','status',
         'division','department','location','timeZone','defaultLocale',
@@ -156,7 +158,7 @@ app.get('/api/score', async (req, res) => {
       $format: 'json',
       $filter: candidates.length > 1 ? `(${orFilter})` : orFilter,
       $select: [
-        'externalCode','cust_Score','externalName','mdfSystemRecordStatus',
+        'externalCode','cust_Score','cust_Streak','externalName','mdfSystemRecordStatus',
         'createdBy','createdDateTime','lastModifiedBy','lastModifiedDateTime'
       ].join(',')
     };
@@ -194,10 +196,36 @@ app.get('/api/score', async (req, res) => {
     const results = resp.data?.d?.results ?? [];
     if (!results.length) return res.json({ found: false, score: null });
 
-    const s = results[0];
+    // Prefer the record with the highest numeric score, then highest streak,
+    // then by most recent lastModifiedDateTime.
+    const pickBest = (arr) => {
+      const toNum = (v) => {
+        const n = Number(String(v ?? '').replace(/,/g, ''));
+        return Number.isFinite(n) ? n : 0;
+      };
+      const toTs = (v) => {
+        // SF OData often returns /Date(1757663365000+0000)/
+        const m = String(v || '').match(/\d{10,}/);
+        return m ? Number(m[0]) : 0;
+      };
+      return arr.reduce((best, x) => {
+        if (!best) return x;
+        const sA = toNum(x.cust_Score);
+        const sB = toNum(best.cust_Score);
+        if (sA !== sB) return sA > sB ? x : best;
+        const kA = toNum(x.cust_Streak);
+        const kB = toNum(best.cust_Streak);
+        if (kA !== kB) return kA > kB ? x : best;
+        const tA = toTs(x.lastModifiedDateTime);
+        const tB = toTs(best.lastModifiedDateTime);
+        return tA > tB ? x : best;
+      }, null);
+    };
+    const s = pickBest(results);
     const score = {
       externalCode: s.externalCode,
       score: s.cust_Score,
+      streak: s.cust_Streak,
       externalName: s.externalName,
       mdfSystemRecordStatus: s.mdfSystemRecordStatus,
       createdBy: s.createdBy,
@@ -222,7 +250,7 @@ app.put('/api/score', async (req, res) => {
     if (!updates || typeof updates !== 'object') return res.status(400).json({ error: 'updates object is required' });
 
     // Allow-list fields for safety
-    const allowed = new Set(['cust_Score', 'externalName', 'mdfSystemRecordStatus']);
+    const allowed = new Set(['cust_Score', 'cust_Streak', 'externalName', 'mdfSystemRecordStatus']);
     const body = {};
     for (const [k, v] of Object.entries(updates)) {
       if (allowed.has(k)) body[k] = v;
@@ -331,7 +359,7 @@ app.put('/api/score', async (req, res) => {
 // Create a new cust_Score record
 app.post('/api/score', async (req, res) => {
   try {
-    const { username, externalCode, externalName, cust_Score } = req.body || {};
+    const { username, externalCode, externalName, cust_Score, cust_Streak } = req.body || {};
     const inputCode = externalCode || username;
     if (!inputCode) return res.status(400).json({ error: 'externalCode or username is required' });
 
@@ -384,7 +412,8 @@ app.post('/api/score', async (req, res) => {
     const body = {
       externalCode: codeToUse,
       ...(externalName != null ? { externalName } : {}),
-      ...(cust_Score != null ? { cust_Score } : {})
+      ...(cust_Score != null ? { cust_Score } : {}),
+      ...(cust_Streak != null ? { cust_Streak } : {})
     };
     const url = `${BASE_URL}/odata/v2/cust_Score`;
     const params = {};
